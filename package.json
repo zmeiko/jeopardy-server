@@ -1,0 +1,25 @@
+{
+  "name": "jeopardy-server",
+  "version": "1.0.0",
+  "description": "Server for game Jeopardy",
+  "main": "index.js",
+  "author": "Ilya Kurganskiy",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "watch-server": "nodemon --watch 'src/**/*' -e ts,tsx --exec ts-node ./src/server.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.11.3",
+    "@types/koa-router": "^7.4.0",
+    "nodemon": "^2.0.3",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-router": "^8.0.8",
+    "sequelize": "^5.21.6"
+  }
+}
