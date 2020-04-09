@@ -1,15 +1,20 @@
 import * as Koa from 'koa';
 import * as Router from 'koa-router';
+import {createConnection} from "typeorm";
 
-const app = new Koa();
-const router = new Router();
+createConnection().then(async connection => {
 
-router.get('/*', async (ctx) => {
-    ctx.body = 'Hello World!';
-});
+    const app = new Koa();
+    const router = new Router();
 
-app.use(router.routes());
+    router.get('/*', async (ctx) => {
+        ctx.body = 'Hello World!';
+    });
 
-app.listen(3000);
+    app.use(router.routes());
 
-console.log('Server running on port 3000');
+    app.listen(3000);
+
+    console.log("Koa application is up and running on port 3000");
+
+}).catch(error => console.log("TypeORM connection error: ", error));
