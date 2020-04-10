@@ -1,17 +1,27 @@
-import { GameStatePayload } from "../Game.types";
-import * as gameController from "../Game.controller";
+import { createGame, selectFirstPlayer } from "../actions";
+import { generateRounds } from "./utils";
 
 test("test select first player", () => {
-  const emptyState: GameStatePayload = gameController.createGame();
+  const { settings, state } = createGame({
+    creatorPlayerId: 1,
+    playerIds: [1, 2],
+    rounds: generateRounds(),
+  });
 
-  const gameState = gameController.selectFirstPlayer({ userId: 1 }, emptyState);
+  const gameState = selectFirstPlayer({ userId: 1 }, state, settings);
   expect(gameState.currentPlayerId).toEqual(1);
 });
 
 test("test select first player after selected", () => {
-  let state: GameStatePayload = gameController.createGame();
-  state = gameController.selectFirstPlayer({ userId: 1 }, state);
+  const data = createGame({
+    creatorPlayerId: 1,
+    playerIds: [1, 2],
+    rounds: generateRounds(),
+  });
+  const settings = data.settings;
+  let state = data.state;
+  state = selectFirstPlayer({ userId: 1 }, state, settings);
   expect(() =>
-    gameController.selectFirstPlayer({ userId: 2 }, state)
+    selectFirstPlayer({ userId: 2 }, state, settings)
   ).toThrowError();
 });

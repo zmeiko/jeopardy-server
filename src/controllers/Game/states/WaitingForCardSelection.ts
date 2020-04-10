@@ -8,7 +8,7 @@ export class WaitingForCardSelection extends BaseGameState {
     super(
       {
         ...statePayload,
-        stateName: ACTIONS_STATES.WAITING_FOR_FIRST_USER,
+        stateName: ACTIONS_STATES.WAITING_FOR_CARD_SELECTION,
       },
       gameSettings
     );

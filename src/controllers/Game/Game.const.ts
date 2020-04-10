@@ -1,3 +1,3 @@
-export const SETTINGS = {
+export const DEFAULT_SETTINGS = {
   ANSWER_TIMEOUT: 60 * 1000,
 };

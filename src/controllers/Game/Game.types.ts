@@ -1,8 +1,8 @@
 export interface GameQuestion {
   id: number;
   price: number;
-  info: {
-    comment: string;
+  info?: {
+    comment?: string;
   };
   scenario: string;
   answer: string;

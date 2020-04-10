@@ -3,7 +3,7 @@ import { BaseGameState } from "./BaseGameState";
 import { concatAllQuestionInRound, findRound } from "./state.utils";
 import { WaitingForCardSelection } from "./WaitingForCardSelection";
 
-export abstract class FinishableState extends BaseGameState {
+export class FinishableState extends BaseGameState {
   protected roundWillFinish() {
     const { currentRoundId, openedQuestionsIds } = this.statePayload;
     const currentRound = findRound(this.gameSettings, currentRoundId);
