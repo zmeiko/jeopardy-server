@@ -1,19 +1,27 @@
 import * as Koa from "koa";
-import * as Router from "koa-router";
 import { createConnection } from "typeorm";
+import { createServer } from "http";
 
 createConnection()
   .then(async () => {
     const app = new Koa();
-    const router = new Router();
 
-    router.get("/*", async (ctx) => {
-      ctx.body = "Hello World!";
+    const server = createServer(app.callback());
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const io = require("socket.io")(server);
+
+    io.on("connection", function (socket) {
+      io.emit("chat message", "HI");
+      socket.on("disconnect", function () {
+        console.log("user disconnected");
+      });
+      socket.on("chat", function (msg) {
+        console.log("chat message", msg);
+        io.emit("chat message", msg);
+      });
     });
 
-    app.use(router.routes());
-    app.listen(3000);
-
+    server.listen(3000);
     console.log("Koa application is up and running on port 3000");
   })
   .catch((error) => console.log("TypeORM connection error: ", error));
