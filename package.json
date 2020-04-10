@@ -10,7 +10,7 @@
     "docker-watch-server": "docker-compose -f docker/docker-compose.yml up",
     "docker-stop": "docker-compose -f docker/docker-compose.yml down",
     "docker-exec": "docker-compose -f docker/docker-compose.yml exec",
-    "watch-server": "nodemon --watch 'src/**/*' -e ts,tsx --exec ts-node ./src/server.ts",
+    "watch-server": "nodemon --watch 'src/**/*.ts' --exec ts-node -L ./src/server.ts",
     "typeorm": "ts-node ./node_modules/.bin/typeorm",
     "lint:write": "eslint --debug src/ --fix",
     "prettier": "prettier --write src/**/*.js",

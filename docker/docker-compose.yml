@@ -17,8 +17,7 @@ services:
       context: ../
     restart: always
     volumes:
-      - ../:/home/node/app
-      - /home/node/app/node_modules
+      - ../src:/home/node/app/src
     ports:
       - 3000:3000
     depends_on:
