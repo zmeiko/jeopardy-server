@@ -4,17 +4,20 @@ import {
   GameState,
   GameStatePayload,
 } from "../Game.types";
-import { FinishableState } from "./FinishableState";
+import { BaseGameState } from "./BaseGameState";
 import {
   concatAllQuestionInRound,
   findRound,
+  getNextRoundOrFinishState,
+  roundWillFinish,
   updateScore,
-} from "./state.utils";
+} from "./helper";
+
 import { ACTIONS_STATES } from "./states.const";
 import { WaitingForCardSelection } from "./WaitingForCardSelection";
 import { WaitingForQuestionCapture } from "./WaitingForQuestionCapture";
 
-export class WaitingForAnswer extends FinishableState {
+export class WaitingForAnswer extends BaseGameState {
   constructor(statePayload: GameStatePayload, gameSettings: GameSettings) {
     super(
       {
@@ -62,12 +65,12 @@ export class WaitingForAnswer extends FinishableState {
       newAnsweredPlayerIds.length === this.gameSettings.playerIds.length;
 
     if (allPlayerHasAnswered) {
-      if (this.roundWillFinish()) {
-        return this.nextRound(nextPayloadState);
+      if (roundWillFinish(nextPayloadState, this.gameSettings)) {
+        return getNextRoundOrFinishState(nextPayloadState, this.gameSettings);
       } else {
-        const waitingPayloadState = {
+        const waitingPayloadState: GameStatePayload = {
           ...nextPayloadState,
-          answeringUserId: null,
+          answeringPlayerId: null,
           answeredPlayerIds: [],
           selectedQuestionId: null,
         };
@@ -93,17 +96,17 @@ export class WaitingForAnswer extends FinishableState {
       score: payload.price,
     });
     const newOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
-    const nextPayloadSate = {
+    const nextPayloadSate: GameStatePayload = {
       ...this.gameState,
       openedQuestionsIds: newOpenedQuestionIds,
-      playerScore: newPlayerScores,
+      playerScores: newPlayerScores,
       currentPlayerId: answeringPlayerId,
-      answeringUserId: null,
+      answeringPlayerId: null,
       answeredPlayerIds: [],
       selectedQuestionId: null,
     };
-    if (this.roundWillFinish()) {
-      return this.nextRound(nextPayloadSate);
+    if (roundWillFinish(nextPayloadSate, this.gameSettings)) {
+      return getNextRoundOrFinishState(nextPayloadSate, this.gameSettings);
     } else {
       return new WaitingForCardSelection(nextPayloadSate, this.gameSettings);
     }

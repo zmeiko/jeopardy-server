@@ -1,12 +1,11 @@
 import { GameSettings, GameState, GameStatePayload } from "../Game.types";
 import { BaseGameState } from "./BaseGameState";
-import { FinishableState } from "./FinishableState";
-import { FinishUserState } from "./FinishUserState";
+import { getNextRoundOrFinishState, roundWillFinish } from "./helper";
 import { ACTIONS_STATES } from "./states.const";
 import { WaitingForAnswer } from "./WaitingForAnswer";
 import { WaitingForCardSelection } from "./WaitingForCardSelection";
 
-export class WaitingForQuestionCapture extends FinishableState {
+export class WaitingForQuestionCapture extends BaseGameState {
   constructor(statePayload: GameStatePayload, gameSettings: GameSettings) {
     super(
       {
@@ -45,19 +44,15 @@ export class WaitingForQuestionCapture extends FinishableState {
     const { openedQuestionsIds, selectedQuestionId } = this.gameState;
     const newOpenedCardIds = [...openedQuestionsIds, selectedQuestionId];
 
-    if (this.roundWillFinish()) {
-      return this.nextRound({
-        ...this.gameState,
-        openedQuestionsIds: newOpenedCardIds,
-      });
+    const nextGameState = {
+      ...this.gameState,
+      openedQuestionsIds: newOpenedCardIds,
+    };
+
+    if (roundWillFinish(nextGameState, this.gameSettings)) {
+      return getNextRoundOrFinishState(nextGameState, this.gameSettings);
     } else {
-      return new WaitingForCardSelection(
-        {
-          ...this.gameState,
-          openedQuestionsIds: newOpenedCardIds,
-        },
-        this.gameSettings
-      );
+      return new WaitingForCardSelection(nextGameState, this.gameSettings);
     }
   }
 
