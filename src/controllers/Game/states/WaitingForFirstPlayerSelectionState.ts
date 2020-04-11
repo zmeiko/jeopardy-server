@@ -14,18 +14,14 @@ export class WaitingForFirstPlayerSelectionState extends BaseGameState {
     );
   }
 
-  selectUser(payload: { userId: number }): GameState {
+  selectFirstUser(payload: { userId: number }): GameState {
     const { userId } = payload;
     return new WaitingForCardSelection(
       {
-        ...this.statePayload,
+        ...this.gameState,
         currentPlayerId: userId,
       },
       this.gameSettings
     );
-  }
-
-  tick(): GameState {
-    return this;
   }
 }

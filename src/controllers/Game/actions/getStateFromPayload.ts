@@ -1,6 +1,7 @@
 import { GameSettings, GameState, GameStatePayload } from "../Game.types";
 import { FinishUserState } from "../states/FinishUserState";
 import { ACTIONS_STATES } from "../states/states.const";
+import { WaitingForAnswer } from "../states/WaitingForAnswer";
 import { WaitingForCardSelection } from "../states/WaitingForCardSelection";
 import { WaitingForFirstPlayerSelectionState } from "../states/WaitingForFirstPlayerSelectionState";
 import { WaitingForQuestionCapture } from "../states/WaitingForQuestionCapture";
@@ -21,7 +22,9 @@ export default function getStateFromPayload(
       return new WaitingForCardSelection(statePayload, gameSettings);
     case ACTIONS_STATES.WAITING_FOR_CAPTURE_QUESTION:
       return new WaitingForQuestionCapture(statePayload, gameSettings);
+    case ACTIONS_STATES.WAITING_FOR_USER_ANSWER:
+      return new WaitingForAnswer(statePayload, gameSettings);
     default:
-      throw new Error("Unknown state");
+      throw new Error(`Unknown state - ${statePayload.stateName}`);
   }
 }

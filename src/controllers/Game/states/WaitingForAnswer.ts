@@ -25,9 +25,13 @@ export class WaitingForAnswer extends FinishableState {
     );
   }
 
-  answer(payload: { userId: number; answer: string }): GameState {
+  answer(payload: {
+    userId: number;
+    answer: string;
+    timestamp?: Date;
+  }): GameState {
     const { answer: answerText, userId } = payload;
-    const { answeringUserId } = this.statePayload;
+    const { answeringUserId } = this.gameState;
     if (userId !== answeringUserId) {
       throw new Error(`Only user with id = ${userId} can answer`);
     }
@@ -41,14 +45,14 @@ export class WaitingForAnswer extends FinishableState {
   }
 
   protected wrongAnswer(payload: { price: number }): GameState {
-    const { answeringUserId, answeredPlayerIds } = this.statePayload;
-    const playerScore = updateScore(this.statePayload.playerScore, {
+    const { answeringUserId, answeredPlayerIds } = this.gameState;
+    const playerScore = updateScore(this.gameState.playerScore, {
       userId: answeringUserId,
       score: -payload.price,
     });
     const newAnsweredPlayerIds = [...answeredPlayerIds, answeringUserId];
     const nextPayloadState = {
-      ...this.statePayload,
+      ...this.gameState,
       playerScore,
       cardSelectionAt: new Date(),
       answeringUserId: null,
@@ -79,14 +83,20 @@ export class WaitingForAnswer extends FinishableState {
   }
 
   private rightAnswer(payload: { price: number }): GameState {
-    const { answeringUserId } = this.statePayload;
-    const playerScore = updateScore(this.statePayload.playerScore, {
+    const {
+      answeringUserId,
+      openedQuestionsIds,
+      selectedQuestionId,
+    } = this.gameState;
+    const newPlayerScores = updateScore(this.gameState.playerScore, {
       userId: answeringUserId,
       score: payload.price,
     });
+    const newOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
     const nextPayloadSate = {
-      ...this.statePayload,
-      playerScore,
+      ...this.gameState,
+      openedQuestionsIds: newOpenedQuestionIds,
+      playerScore: newPlayerScores,
       currentPlayerId: answeringUserId,
       answeringUserId: null,
       answeredPlayerIds: [],
@@ -100,7 +110,7 @@ export class WaitingForAnswer extends FinishableState {
   }
 
   private getCurrentQuestion(): GameQuestion {
-    const { currentRoundId, selectedQuestionId } = this.statePayload;
+    const { currentRoundId, selectedQuestionId } = this.gameState;
     const currentRound = findRound(this.gameSettings, currentRoundId);
     if (!currentRound) {
       throw new Error(`Round with id = ${currentRoundId} not found`);

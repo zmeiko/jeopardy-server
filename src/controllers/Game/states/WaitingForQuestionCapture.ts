@@ -17,15 +17,15 @@ export class WaitingForQuestionCapture extends FinishableState {
     );
   }
 
-  captureQuestion(payload: { userId: number }): GameState {
-    const { userId } = payload;
+  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState {
+    const { userId, timestamp = new Date() } = payload;
 
-    if (this.timeIsOver()) {
+    if (this.timeIsOver(timestamp)) {
       return this.waitNextCard();
     }
     return new WaitingForAnswer(
       {
-        ...this.statePayload,
+        ...this.gameState,
         answeringUserId: userId,
         questionCaptureAt: new Date(),
       },
@@ -33,26 +33,27 @@ export class WaitingForQuestionCapture extends FinishableState {
     );
   }
 
-  tick(): GameState {
-    if (!this.timeIsOver()) {
+  tick(payload: { timestamp?: Date }): GameState {
+    const { timestamp } = payload;
+    if (!this.timeIsOver(timestamp)) {
       return this.waitNextCard();
     }
     return this;
   }
 
   private waitNextCard(): GameState {
-    const { openedQuestionsIds, selectedQuestionId } = this.statePayload;
+    const { openedQuestionsIds, selectedQuestionId } = this.gameState;
     const newOpenedCardIds = [...openedQuestionsIds, selectedQuestionId];
 
     if (this.roundWillFinish()) {
       return this.nextRound({
-        ...this.statePayload,
+        ...this.gameState,
         openedQuestionsIds: newOpenedCardIds,
       });
     } else {
       return new WaitingForCardSelection(
         {
-          ...this.statePayload,
+          ...this.gameState,
           openedQuestionsIds: newOpenedCardIds,
         },
         this.gameSettings
@@ -60,10 +61,10 @@ export class WaitingForQuestionCapture extends FinishableState {
     }
   }
 
-  private timeIsOver(): boolean {
-    const now = new Date().getTime();
+  private timeIsOver(timestamp: Date): boolean {
+    const now = timestamp.getTime();
     return (
-      this.statePayload.cardSelectionAt?.getTime() +
+      this.gameState.cardSelectionAt?.getTime() +
         this.gameSettings.captureTimeoutMs >
       now
     );

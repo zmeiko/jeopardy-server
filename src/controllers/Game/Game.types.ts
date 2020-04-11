@@ -45,13 +45,23 @@ export interface GameStatePayload {
 }
 
 export interface GameState {
-  readonly statePayload: GameStatePayload;
-  start(): GameState;
-  selectUser(payload: { userId: number }): GameState;
-  selectCard(payload: { userId: number; cardId: number }): GameState;
-  captureQuestion(payload: { userId: number }): GameState;
-  answer(payload: { userId: number; answer: string }): GameState;
-  finish(payload: { force: boolean }): GameState;
+  readonly gameState: GameStatePayload;
 
-  tick(): GameState;
+  selectFirstUser(payload: { userId: number }): GameState;
+
+  selectQuestion(payload: {
+    userId: number;
+    questionId: number;
+    timestamp?: Date;
+  }): GameState;
+
+  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState;
+
+  answer(payload: {
+    userId: number;
+    answer: string;
+    timestamp?: Date;
+  }): GameState;
+
+  tick(payload: { timestamp?: Date }): GameState;
 }

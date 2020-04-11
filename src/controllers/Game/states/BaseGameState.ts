@@ -1,46 +1,39 @@
 import { GameSettings, GameState, GameStatePayload } from "../Game.types";
-import { FinishUserState } from "./FinishUserState";
 
 export class BaseGameState implements GameState {
-  public readonly statePayload: GameStatePayload;
+  public readonly gameState: GameStatePayload;
   protected readonly gameSettings: GameSettings;
 
   constructor(gameState: GameStatePayload, gameSettings: GameSettings) {
-    this.statePayload = gameState;
+    this.gameState = gameState;
     this.gameSettings = gameSettings;
   }
 
-  tick(): GameState {
+  tick(payload: { timestamp?: Date }): GameState {
     return this;
   }
 
-  answer(payload: { userId: number; answer: string }): GameState {
-    throw new Error("Invalid state");
-  }
-
-  captureQuestion(payload: {
+  answer(payload: {
     userId: number;
-    timeoutDurationMs: number;
+    answer: string;
+    timestamp?: Date;
   }): GameState {
     throw new Error("Invalid state");
   }
 
-  finish(payload: { force: boolean }): GameState {
-    if (payload.force) {
-      return new FinishUserState(this.statePayload, this.gameSettings);
-    }
+  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState {
     throw new Error("Invalid state");
   }
 
-  selectCard(payload: { userId: number; cardId: number }): GameState {
+  selectQuestion(payload: {
+    userId: number;
+    questionId: number;
+    timestamp?: Date;
+  }): GameState {
     throw new Error("Invalid state");
   }
 
-  selectUser(payload: { userId: number }): GameState {
-    throw new Error("Invalid state");
-  }
-
-  start(): GameState {
+  selectFirstUser(payload: { userId: number }): GameState {
     throw new Error("Invalid state");
   }
 }

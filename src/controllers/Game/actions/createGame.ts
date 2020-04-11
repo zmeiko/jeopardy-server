@@ -2,6 +2,12 @@ import { DEFAULT_SETTINGS } from "../Game.const";
 import { GameRound, GameSettings, GameStatePayload } from "../Game.types";
 import { WaitingForFirstPlayerSelectionState } from "../states/WaitingForFirstPlayerSelectionState";
 
+function createEmptyScoreMap(userIds: number[]) {
+  const mapScore = new Map<number, number>();
+  userIds.forEach((id) => mapScore.set(id, 0));
+  return mapScore;
+}
+
 export function createGame(payload: {
   rounds: GameRound[];
   creatorPlayerId: number;
@@ -23,7 +29,7 @@ export function createGame(payload: {
   const gameState = new WaitingForFirstPlayerSelectionState(
     {
       stateName: "",
-      currentRoundId: 1,
+      currentRoundId: rounds[0].id,
       currentPlayerId: null,
       selectedQuestionId: null,
       answeringUserId: null,
@@ -31,10 +37,10 @@ export function createGame(payload: {
       questionCaptureAt: null,
       openedQuestionsIds: [],
       answeredPlayerIds: [],
-      playerScore: new Map<number, number>(),
+      playerScore: createEmptyScoreMap(playerIds),
     },
     gameSettings
-  ).statePayload;
+  ).gameState;
 
   return { settings: gameSettings, state: gameState };
 }

@@ -1,42 +1,41 @@
 import { GameSettings, GameState, GameStatePayload } from "../Game.types";
-import { BaseGameState } from "./BaseGameState";
 import { ACTIONS_STATES } from "./states.const";
 
 export class FinishUserState implements GameState {
-  readonly statePayload: GameStatePayload;
+  readonly gameState: GameStatePayload;
 
   constructor(state: GameStatePayload, gameSettings: GameSettings) {
-    this.statePayload = {
-      stateName: ACTIONS_STATES.FINISH_GAME,
+    this.gameState = {
       ...state,
+      stateName: ACTIONS_STATES.FINISH_GAME,
     };
   }
 
-  tick(): GameState {
+  tick(payload: { timestamp?: Date }): GameState {
     return this;
   }
 
-  answer(payload: { userId: number; answer: string }): GameState {
+  answer(payload: {
+    userId: number;
+    answer: string;
+    timestamp?: Date;
+  }): GameState {
     throw new Error("Game has already finished");
   }
 
-  captureQuestion(payload: { userId: number }): GameState {
+  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState {
     throw new Error("Game has already finished");
   }
 
-  finish(payload: { force: boolean }): GameState {
+  selectQuestion(payload: {
+    userId: number;
+    questionId: number;
+    timestamp?: Date;
+  }): GameState {
     throw new Error("Game has already finished");
   }
 
-  selectCard(payload: { userId: number; cardId: number }): GameState {
-    throw new Error("Game has already finished");
-  }
-
-  selectUser(payload: { userId: number }): GameState {
-    throw new Error("Game has already finished");
-  }
-
-  start(): GameState {
+  selectFirstUser(payload: { userId: number }): GameState {
     throw new Error("Game has already finished");
   }
 }

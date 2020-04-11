@@ -1,11 +1,10 @@
 import { GameQuestion, GameRound, GameTheme } from "../Game.types";
 
 function generateNumberArray(n: number) {
-  return new Array(n).map((i) => i);
+  return Array.from(new Array(n), (_, i) => i);
 }
 
-export function generateQuestion(): GameQuestion {
-  const id = Math.random() * 1000000;
+export function generateQuestion(id: number): GameQuestion {
   return {
     id: id,
     answer: "yes",
@@ -14,9 +13,13 @@ export function generateQuestion(): GameQuestion {
   };
 }
 
-export function generateTheme(payload: { questionCount: number }): GameTheme {
-  const questions = generateNumberArray(payload.questionCount).map(() =>
-    generateQuestion()
+export function generateTheme(payload: {
+  roundIndex: number;
+  questionCount: number;
+}): GameTheme {
+  const { questionCount, roundIndex } = payload;
+  const questions = generateNumberArray(questionCount).map((questionIndex) =>
+    generateQuestion(roundIndex * 10000 + questionIndex)
   );
   return {
     questions,
@@ -27,15 +30,14 @@ export function generateRounds(payload?: {
   roundCount?: number;
   themeCount?: number;
   questionCountInRound?: number;
-  userCount?: number;
 }): GameRound[] {
   const { questionCountInRound = 5, roundCount = 1, themeCount = 3 } =
     payload || {};
   return generateNumberArray(roundCount).map((roundIndex) => ({
     id: roundIndex,
     name: `Round ${roundIndex}`,
-    themes: generateNumberArray(themeCount).map(() =>
-      generateTheme({ questionCount: questionCountInRound })
+    themes: generateNumberArray(themeCount).map((roundIndex: number) =>
+      generateTheme({ roundIndex, questionCount: questionCountInRound })
     ),
   }));
 }
