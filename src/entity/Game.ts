@@ -14,9 +14,12 @@ import { GameStatePayload, PlayerScore } from "../service/Game";
 import { User } from "./User";
 
 @ObjectType("PlayerScore")
-class PlayerScoreObjectType implements PlayerScore {
+export class PlayerScoreEntry implements PlayerScore {
   @Field()
   playerId: number;
+
+  @Field((type) => User)
+  player: User;
 
   @Field()
   score: number;
@@ -45,6 +48,9 @@ export class GameStateEntry implements GameStatePayload {
   })
   answeringPlayerId: number | null;
 
+  @Field((type) => User, { nullable: true })
+  answeringPlayer?: User;
+
   @Field(() => [Int])
   readonly answeredPlayerIds: number[];
 
@@ -61,7 +67,7 @@ export class GameStateEntry implements GameStatePayload {
   @Field(() => [Int])
   readonly openedQuestionsIds: number[];
 
-  @Field(() => [PlayerScoreObjectType])
+  @Field(() => [PlayerScoreEntry])
   readonly playerScores: PlayerScore[]; //userId-score
 }
 

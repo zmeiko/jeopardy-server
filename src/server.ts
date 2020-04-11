@@ -1,13 +1,23 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
-import { GameResolver, UserResolver } from "./resolvers";
+import {
+  GamePlayerScoreResolver,
+  GameResolver,
+  GameStateResolver,
+  UserResolver,
+} from "./resolvers";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 
 createConnection()
   .then(async () => {
     const schema = await buildSchema({
-      resolvers: [UserResolver, GameResolver],
+      resolvers: [
+        UserResolver,
+        GameResolver,
+        GameStateResolver,
+        GamePlayerScoreResolver,
+      ],
     });
     const server = new ApolloServer({ schema });
     await server.listen(3000);
