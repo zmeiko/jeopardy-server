@@ -25,6 +25,11 @@ export interface GameSettings {
   playerIds: number[];
 }
 
+export interface PlayerScore {
+  playerId: number;
+  score: number;
+}
+
 export interface GameStatePayload {
   readonly stateName: string;
 
@@ -41,7 +46,7 @@ export interface GameStatePayload {
 
   readonly openedQuestionsIds: number[];
 
-  readonly playerScores: Map<number, number>; //userId-score
+  readonly playerScores: PlayerScore[]; //userId-score
 }
 
 export interface GameState {

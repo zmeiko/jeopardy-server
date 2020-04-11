@@ -8,48 +8,59 @@ import {
   RelationId,
 } from "typeorm";
 import { Field, ID, ObjectType, Int } from "type-graphql";
+import { GameState, GameStatePayload, PlayerScore } from "../controllers/Game";
 import { User } from "./User";
 
-@ObjectType()
-class UserScoreObjectType {
+@ObjectType("PlayerScore")
+class PlayerScoreObjectType implements PlayerScore {
   @Field()
-  userId: string;
+  playerId: number;
 
   @Field()
   score: number;
 }
 
-@ObjectType()
-class GameStateObjectType {
+@ObjectType("GameState")
+class GameStateObjectType implements GameStatePayload {
   @Field()
   stateName: string | null;
 
   @Field()
-  currentRoundId: number | null;
+  currentRoundId: number;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   currentPlayerId: number | null;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   selectedQuestionId: number | null;
 
-  @Field()
-  answeringUserId: number | null;
+  @Field({
+    nullable: true,
+  })
+  answeringPlayerId: number | null;
 
   @Field(() => [Int])
   readonly answeredPlayerIds: number[];
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   readonly cardSelectionAt: Date | null;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   readonly questionCaptureAt?: Date | null;
 
   @Field(() => [Int])
   readonly openedQuestionsIds: number[];
 
-  @Field(() => [UserScoreObjectType])
-  readonly playerScore: GameEntityUserScorePayload; //userId-score
+  @Field(() => [PlayerScoreObjectType])
+  readonly playerScores: PlayerScore[]; //userId-score
 }
 
 @ObjectType()
@@ -59,42 +70,18 @@ export class Game extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field(() => User)
   @ManyToOne(() => User)
   creator: User;
 
-  @Field()
   @RelationId((gane: Game) => gane.creator) // you need to specify target relation
   creatorUserId: number;
 
   @Field(() => GameStateObjectType)
   @Column({ type: "jsonb" })
-  state: GameEntityStatePayload;
+  state: GameState;
 
   @Field()
   @CreateDateColumn()
   createdAt: Date;
-}
-
-interface GameEntityUserScorePayload {
-  userId: number;
-  score: number;
-}
-
-interface GameEntityStatePayload {
-  readonly stateName: string;
-
-  readonly currentRoundId: number;
-
-  readonly currentPlayerId: number | null;
-  readonly selectedQuestionId: number | null;
-
-  readonly answeringUserId: number | null;
-  readonly answeredPlayerIds: number[];
-
-  readonly cardSelectionAt: Date | null;
-  readonly questionCaptureAt?: Date | null;
-
-  readonly openedQuestionsIds: number[];
-
-  readonly playerScore: GameEntityUserScorePayload[];
 }

@@ -46,14 +46,14 @@ export class WaitingForAnswer extends FinishableState {
 
   protected wrongAnswer(payload: { price: number }): GameState {
     const { answeringPlayerId, answeredPlayerIds } = this.gameState;
-    const playerScore = updateScore(this.gameState.playerScores, {
-      userId: answeringPlayerId,
+    const newPlayerScores = updateScore(this.gameState.playerScores, {
+      playerId: answeringPlayerId,
       score: -payload.price,
     });
     const newAnsweredPlayerIds = [...answeredPlayerIds, answeringPlayerId];
     const nextPayloadState = {
       ...this.gameState,
-      playerScore,
+      playerScore: newPlayerScores,
       cardSelectionAt: new Date(),
       answeringUserId: null,
       answeredPlayerIds: newAnsweredPlayerIds,
@@ -89,7 +89,7 @@ export class WaitingForAnswer extends FinishableState {
       selectedQuestionId,
     } = this.gameState;
     const newPlayerScores = updateScore(this.gameState.playerScores, {
-      userId: answeringPlayerId,
+      playerId: answeringPlayerId,
       score: payload.price,
     });
     const newOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];

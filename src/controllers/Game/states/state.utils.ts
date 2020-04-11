@@ -1,18 +1,26 @@
-import { GameQuestion, GameRound, GameSettings } from "../Game.types";
+import {
+  GameQuestion,
+  GameRound,
+  GameSettings,
+  PlayerScore,
+} from "../Game.types";
 
 export function updateScore(
-  scoreMap: Map<number, number>,
-  payload: { userId: number; score: number }
-) {
-  // todo: replace with copy;
-  const { score, userId } = payload;
-  if (!scoreMap.has(userId)) {
-    throw new Error(`User with id = ${userId} hasn't scores`);
+  scores: PlayerScore[],
+  payload: { playerId: number; score: number }
+): PlayerScore[] {
+  const { score, playerId } = payload;
+  const scoreObject = scores.find((item) => (item.playerId = playerId));
+  if (!scoreObject) {
+    throw new Error(`User with id = ${playerId} hasn't scores`);
   }
-  const currentScore = scoreMap.get(userId)!;
-  const newScore = currentScore + score;
-  scoreMap.set(userId, newScore);
-  return scoreMap;
+  return [
+    ...scores,
+    {
+      ...scoreObject,
+      score: scoreObject.score + score,
+    },
+  ];
 }
 
 export function findRound(gameSettings: GameSettings, roundId: number) {
