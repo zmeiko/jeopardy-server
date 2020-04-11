@@ -6,9 +6,11 @@ import {
   CreateDateColumn,
   ManyToOne,
   RelationId,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { Field, ID, ObjectType, Int } from "type-graphql";
-import { GameState, GameStatePayload, PlayerScore } from "../controllers/Game";
+import { GameStatePayload, PlayerScore } from "../service/Game";
 import { User } from "./User";
 
 @ObjectType("PlayerScore")
@@ -21,7 +23,7 @@ class PlayerScoreObjectType implements PlayerScore {
 }
 
 @ObjectType("GameState")
-class GameStateObjectType implements GameStatePayload {
+export class GameStateEntry implements GameStatePayload {
   @Field()
   stateName: string | null;
 
@@ -64,7 +66,7 @@ class GameStateObjectType implements GameStatePayload {
 }
 
 @ObjectType()
-@Entity("Game")
+@Entity("game")
 export class Game extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
@@ -77,11 +79,16 @@ export class Game extends BaseEntity {
   @RelationId((gane: Game) => gane.creator) // you need to specify target relation
   creatorUserId: number;
 
-  @Field(() => GameStateObjectType)
+  @Field(() => GameStateEntry)
   @Column({ type: "jsonb" })
-  state: GameState;
+  state: GameStateEntry;
 
   @Field()
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field(() => [User])
+  @ManyToMany((type) => User, (user) => user.games)
+  @JoinTable()
+  players: Promise<User[]>;
 }
