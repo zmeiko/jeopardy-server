@@ -17,8 +17,8 @@ export class WaitingForQuestionCapture extends FinishableState {
     );
   }
 
-  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState {
-    const { userId, timestamp = new Date() } = payload;
+  captureQuestion(payload: { playerId: number; timestamp?: Date }): GameState {
+    const { playerId, timestamp = new Date() } = payload;
 
     if (this.timeIsOver(timestamp)) {
       return this.waitNextCard();
@@ -26,7 +26,7 @@ export class WaitingForQuestionCapture extends FinishableState {
     return new WaitingForAnswer(
       {
         ...this.gameState,
-        answeringUserId: userId,
+        answeringPlayerId: playerId,
         questionCaptureAt: new Date(),
       },
       this.gameSettings

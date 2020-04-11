@@ -16,7 +16,7 @@ test("test select first player", () => {
     rounds: generateRounds(),
   });
 
-  const gameState = selectFirstPlayer({ userId: 1 }, state, settings);
+  const gameState = selectFirstPlayer({ playerId: 1 }, state, settings);
   expect(gameState.currentPlayerId).toEqual(1);
 });
 
@@ -28,9 +28,9 @@ test("test select first player after selected", () => {
   });
   const settings = data.settings;
   let state = data.state;
-  state = selectFirstPlayer({ userId: 1 }, state, settings);
+  state = selectFirstPlayer({ playerId: 1 }, state, settings);
   expect(() =>
-    selectFirstPlayer({ userId: 2 }, state, settings)
+    selectFirstPlayer({ playerId: 2 }, state, settings)
   ).toThrowError();
 });
 
@@ -51,16 +51,16 @@ test("test finish game after open all cards", () => {
 
   const allQuestions = concatAllQuestionInRound(settings.rounds[0]);
 
-  state = selectFirstPlayer({ userId: USER_ID_1 }, state, settings);
+  state = selectFirstPlayer({ playerId: USER_ID_1 }, state, settings);
 
   allQuestions.forEach((question) => {
     state = selectQuestion(
-      { userId: USER_ID_1, questionId: question.id },
+      { playerId: USER_ID_1, questionId: question.id },
       state,
       settings
     );
-    state = captureQuestion({ userId: USER_ID_1 }, state, settings);
-    state = answer({ userId: USER_ID_1, answer: "yes" }, state, settings);
+    state = captureQuestion({ playerId: USER_ID_1 }, state, settings);
+    state = answer({ playerId: USER_ID_1, answer: "yes" }, state, settings);
   });
   expect(state.stateName).toEqual(ACTIONS_STATES.FINISH_GAME);
 });

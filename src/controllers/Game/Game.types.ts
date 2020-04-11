@@ -33,7 +33,7 @@ export interface GameStatePayload {
   readonly currentPlayerId: number | null;
   readonly selectedQuestionId: number | null;
 
-  readonly answeringUserId: number | null;
+  readonly answeringPlayerId: number | null;
   readonly answeredPlayerIds: number[];
 
   readonly cardSelectionAt: Date | null;
@@ -41,24 +41,24 @@ export interface GameStatePayload {
 
   readonly openedQuestionsIds: number[];
 
-  readonly playerScore: Map<number, number>; //userId-score
+  readonly playerScores: Map<number, number>; //userId-score
 }
 
 export interface GameState {
   readonly gameState: GameStatePayload;
 
-  selectFirstUser(payload: { userId: number }): GameState;
+  selectFirstPlayer(payload: { playerId: number }): GameState;
 
   selectQuestion(payload: {
-    userId: number;
+    playerId: number;
     questionId: number;
     timestamp?: Date;
   }): GameState;
 
-  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState;
+  captureQuestion(payload: { playerId: number; timestamp?: Date }): GameState;
 
   answer(payload: {
-    userId: number;
+    playerId: number;
     answer: string;
     timestamp?: Date;
   }): GameState;

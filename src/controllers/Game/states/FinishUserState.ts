@@ -16,26 +16,26 @@ export class FinishUserState implements GameState {
   }
 
   answer(payload: {
-    userId: number;
+    playerId: number;
     answer: string;
     timestamp?: Date;
   }): GameState {
     throw new Error("Game has already finished");
   }
 
-  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState {
+  captureQuestion(payload: { playerId: number; timestamp?: Date }): GameState {
     throw new Error("Game has already finished");
   }
 
   selectQuestion(payload: {
-    userId: number;
+    playerId: number;
     questionId: number;
     timestamp?: Date;
   }): GameState {
     throw new Error("Game has already finished");
   }
 
-  selectFirstUser(payload: { userId: number }): GameState {
+  selectFirstPlayer(payload: { playerId: number }): GameState {
     throw new Error("Game has already finished");
   }
 }

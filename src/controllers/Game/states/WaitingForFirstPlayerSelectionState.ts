@@ -14,12 +14,12 @@ export class WaitingForFirstPlayerSelectionState extends BaseGameState {
     );
   }
 
-  selectFirstUser(payload: { userId: number }): GameState {
-    const { userId } = payload;
+  selectFirstPlayer(payload: { playerId: number }): GameState {
+    const { playerId } = payload;
     return new WaitingForCardSelection(
       {
         ...this.gameState,
-        currentPlayerId: userId,
+        currentPlayerId: playerId,
       },
       this.gameSettings
     );

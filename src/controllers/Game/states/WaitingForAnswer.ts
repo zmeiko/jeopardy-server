@@ -26,14 +26,14 @@ export class WaitingForAnswer extends FinishableState {
   }
 
   answer(payload: {
-    userId: number;
+    playerId: number;
     answer: string;
     timestamp?: Date;
   }): GameState {
-    const { answer: answerText, userId } = payload;
-    const { answeringUserId } = this.gameState;
-    if (userId !== answeringUserId) {
-      throw new Error(`Only user with id = ${userId} can answer`);
+    const { answer: answerText, playerId } = payload;
+    const { answeringPlayerId } = this.gameState;
+    if (playerId !== answeringPlayerId) {
+      throw new Error(`Only user with id = ${playerId} can answer`);
     }
     const question = this.getCurrentQuestion();
     const rightAnswer = question.answer;
@@ -45,12 +45,12 @@ export class WaitingForAnswer extends FinishableState {
   }
 
   protected wrongAnswer(payload: { price: number }): GameState {
-    const { answeringUserId, answeredPlayerIds } = this.gameState;
-    const playerScore = updateScore(this.gameState.playerScore, {
-      userId: answeringUserId,
+    const { answeringPlayerId, answeredPlayerIds } = this.gameState;
+    const playerScore = updateScore(this.gameState.playerScores, {
+      userId: answeringPlayerId,
       score: -payload.price,
     });
-    const newAnsweredPlayerIds = [...answeredPlayerIds, answeringUserId];
+    const newAnsweredPlayerIds = [...answeredPlayerIds, answeringPlayerId];
     const nextPayloadState = {
       ...this.gameState,
       playerScore,
@@ -84,12 +84,12 @@ export class WaitingForAnswer extends FinishableState {
 
   private rightAnswer(payload: { price: number }): GameState {
     const {
-      answeringUserId,
+      answeringPlayerId,
       openedQuestionsIds,
       selectedQuestionId,
     } = this.gameState;
-    const newPlayerScores = updateScore(this.gameState.playerScore, {
-      userId: answeringUserId,
+    const newPlayerScores = updateScore(this.gameState.playerScores, {
+      userId: answeringPlayerId,
       score: payload.price,
     });
     const newOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
@@ -97,7 +97,7 @@ export class WaitingForAnswer extends FinishableState {
       ...this.gameState,
       openedQuestionsIds: newOpenedQuestionIds,
       playerScore: newPlayerScores,
-      currentPlayerId: answeringUserId,
+      currentPlayerId: answeringPlayerId,
       answeringUserId: null,
       answeredPlayerIds: [],
       selectedQuestionId: null,

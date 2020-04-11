@@ -32,12 +32,12 @@ export function createGame(payload: {
       currentRoundId: rounds[0].id,
       currentPlayerId: null,
       selectedQuestionId: null,
-      answeringUserId: null,
+      answeringPlayerId: null,
       cardSelectionAt: null,
       questionCaptureAt: null,
       openedQuestionsIds: [],
       answeredPlayerIds: [],
-      playerScore: createEmptyScoreMap(playerIds),
+      playerScores: createEmptyScoreMap(playerIds),
     },
     gameSettings
   ).gameState;

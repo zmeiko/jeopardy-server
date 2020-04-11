@@ -14,26 +14,26 @@ export class BaseGameState implements GameState {
   }
 
   answer(payload: {
-    userId: number;
+    playerId: number;
     answer: string;
     timestamp?: Date;
   }): GameState {
     throw new Error("Invalid state");
   }
 
-  captureQuestion(payload: { userId: number; timestamp?: Date }): GameState {
+  captureQuestion(payload: { playerId: number; timestamp?: Date }): GameState {
     throw new Error("Invalid state");
   }
 
   selectQuestion(payload: {
-    userId: number;
+    playerId: number;
     questionId: number;
     timestamp?: Date;
   }): GameState {
     throw new Error("Invalid state");
   }
 
-  selectFirstUser(payload: { userId: number }): GameState {
+  selectFirstPlayer(payload: { playerId: number }): GameState {
     throw new Error("Invalid state");
   }
 }

@@ -3,18 +3,18 @@ import getStateFromPayload from "./getStateFromPayload";
 
 export function selectFirstPlayer(
   payload: {
-    userId: number;
+    playerId: number;
   },
   gameState: GameStatePayload,
   gameSettings: GameSettings
 ): GameStatePayload {
   const state = getStateFromPayload(gameState, gameSettings);
-  return state.selectFirstUser(payload).gameState;
+  return state.selectFirstPlayer(payload).gameState;
 }
 
 export function selectQuestion(
   payload: {
-    userId: number;
+    playerId: number;
     questionId: number;
   },
   gameState: GameStatePayload,
@@ -26,7 +26,7 @@ export function selectQuestion(
 
 export function captureQuestion(
   payload: {
-    userId: number;
+    playerId: number;
   },
   gameState: GameStatePayload,
   gameSettings: GameSettings
@@ -37,7 +37,7 @@ export function captureQuestion(
 
 export function answer(
   payload: {
-    userId: number;
+    playerId: number;
     answer: string;
   },
   gameState: GameStatePayload,
