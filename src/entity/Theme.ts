@@ -26,7 +26,7 @@ export class ThemeEntity extends BaseEntity {
   @OneToMany((type) => QuestionEntity, (question) => question.theme, {
     cascade: true,
   })
-  questions: Promise<QuestionEntity[]>;
+  questions: QuestionEntity[];
 
   @Field((type) => RoundEntity)
   @ManyToOne((type) => RoundEntity, (round) => round.themes)

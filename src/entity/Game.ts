@@ -95,7 +95,7 @@ export class GameEntity extends BaseEntity {
   createdAt: Date;
 
   @Field(() => QuizEntity)
-  @ManyToOne((type) => QuizEntity)
+  @ManyToOne((type) => QuizEntity, { nullable: false })
   quiz: QuizEntity;
 
   @RelationId((game: GameEntity) => game.quiz) // you need to specify target relation

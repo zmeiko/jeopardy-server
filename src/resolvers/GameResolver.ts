@@ -11,7 +11,13 @@ import * as quizzes from "../controllers/Quiz.controller";
 import * as users from "../controllers/User.controller";
 import { GameEntity } from "../entity/Game";
 import { User } from "../entity/User";
-import { CreateNewGameInput } from "../inputs/CreateNewGameInput";
+import {
+  CreateNewGameInput,
+  AnswerInput,
+  SelectFirstPlayerInput,
+  SelectQuestionInput,
+  CaptureQuestionInput,
+} from "../inputs/Game";
 
 @Resolver(() => GameEntity)
 export class GameResolver {
@@ -23,6 +29,44 @@ export class GameResolver {
   @Mutation(() => GameEntity)
   async createGame(@Arg("data") data: CreateNewGameInput) {
     const game = await games.createGame(data);
+    return game;
+  }
+
+  @Mutation(() => GameEntity)
+  async selectFirstPlayer(@Arg("data") data: SelectFirstPlayerInput) {
+    const game = await games.selectFirstPlayer({
+      gameId: data.gameId,
+      playerId: data.userId,
+    });
+    return game;
+  }
+
+  @Mutation(() => GameEntity)
+  async selectQuestion(@Arg("data") data: SelectQuestionInput) {
+    const game = await games.selectQuestion({
+      gameId: data.gameId,
+      playerId: data.userId,
+      questionId: data.questionId,
+    });
+    return game;
+  }
+
+  @Mutation(() => GameEntity)
+  async captureQuestion(@Arg("data") data: CaptureQuestionInput) {
+    const game = await games.captureQuestion({
+      gameId: data.gameId,
+      playerId: data.userId,
+    });
+    return game;
+  }
+
+  @Mutation(() => GameEntity)
+  async answer(@Arg("data") data: AnswerInput) {
+    const game = await games.answer({
+      playerId: data.userId,
+      gameId: data.gameId,
+      answer: data.answer,
+    });
     return game;
   }
 

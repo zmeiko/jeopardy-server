@@ -23,7 +23,7 @@ export class RoundEntity extends BaseEntity {
 
   @Field((type) => [ThemeEntity])
   @OneToMany((type) => ThemeEntity, (theme) => theme.round, { cascade: true })
-  themes: Promise<ThemeEntity[]>;
+  themes: ThemeEntity[];
 
   @ManyToOne((type) => QuizEntity, (quiz) => quiz.rounds)
   quiz: QuizEntity;

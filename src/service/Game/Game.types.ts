@@ -4,7 +4,7 @@ export interface GameQuestion {
   info?: {
     comment?: string;
   };
-  scenario: string;
+  title: string;
   answer: string;
 }
 

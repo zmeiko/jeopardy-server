@@ -32,6 +32,10 @@ export class QuestionEntity extends BaseEntity {
   @Column()
   answer: string;
 
+  @Field()
+  @Column()
+  price: number;
+
   @Field(() => ThemeEntity)
   @ManyToOne(() => ThemeEntity, (theme) => theme.questions)
   theme: ThemeEntity;

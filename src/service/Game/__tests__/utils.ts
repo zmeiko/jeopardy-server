@@ -9,7 +9,7 @@ export function generateQuestion(id: number): GameQuestion {
     id: id,
     answer: "yes",
     price: 100,
-    scenario: `Question #${id}`,
+    title: `Question #${id}`,
   };
 }
 

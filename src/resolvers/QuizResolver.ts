@@ -18,7 +18,11 @@ export class QuizResolver {
 
   @FieldResolver()
   async rounds(@Root() quiz: QuizEntity) {
-    return await quiz.rounds;
+    return await RoundEntity.find({
+      where: {
+        quizId: quiz.id,
+      },
+    });
   }
 }
 
@@ -31,7 +35,11 @@ export class RoundResolver {
 
   @FieldResolver()
   async themes(@Root() round: RoundEntity) {
-    return await round.themes;
+    return await ThemeEntity.find({
+      where: {
+        roundId: round.id,
+      },
+    });
   }
 }
 
@@ -44,7 +52,11 @@ export class ThemeResolver {
 
   @FieldResolver()
   async questions(@Root() theme: ThemeEntity) {
-    return await theme.questions;
+    return await QuizEntity.find({
+      where: {
+        themeId: theme.id,
+      },
+    });
   }
 }
 
