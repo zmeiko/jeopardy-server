@@ -1,16 +1,17 @@
+import { Field, ID, Int, ObjectType } from "type-graphql";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
   BaseEntity,
+  Column,
   CreateDateColumn,
-  ManyToOne,
-  RelationId,
-  ManyToMany,
+  Entity,
   JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
-import { Field, ID, ObjectType, Int } from "type-graphql";
 import { GameStatePayload, PlayerScore } from "../service/Game";
+import { QuizEntity } from "./Quiz";
 import { User } from "./User";
 
 @ObjectType("PlayerScore")
@@ -71,9 +72,9 @@ export class GameStateEntry implements GameStatePayload {
   readonly playerScores: PlayerScore[]; //userId-score
 }
 
-@ObjectType()
+@ObjectType("Game")
 @Entity("game")
-export class Game extends BaseEntity {
+export class GameEntity extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
@@ -82,7 +83,7 @@ export class Game extends BaseEntity {
   @ManyToOne(() => User)
   creator: User;
 
-  @RelationId((gane: Game) => gane.creator) // you need to specify target relation
+  @RelationId((game: GameEntity) => game.creator) // you need to specify target relation
   creatorUserId: number;
 
   @Field(() => GameStateEntry)
@@ -92,6 +93,13 @@ export class Game extends BaseEntity {
   @Field()
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field(() => QuizEntity)
+  @ManyToOne((type) => QuizEntity)
+  quiz: QuizEntity;
+
+  @RelationId((game: GameEntity) => game.quiz) // you need to specify target relation
+  quizId: number;
 
   @Field(() => [User])
   @ManyToMany((type) => User, (user) => user.games)

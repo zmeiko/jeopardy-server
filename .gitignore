@@ -8,3 +8,4 @@ tmp/
 temp/
 .graphqlconfig
 schema.graphql
+siq_packages/

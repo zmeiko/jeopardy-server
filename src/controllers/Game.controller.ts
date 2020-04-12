@@ -1,13 +1,14 @@
 import { serviceGameStateToEntryGameState } from "../dto/Game.dto";
+import { GameEntity } from "../entity/Game";
 import * as gameService from "../service/Game";
-import { Game } from "../entity/Game";
 import * as users from "./User.controller";
 
 export async function createGame(payload: {
   creatorId: number;
   userIds: number[];
+  quizId: number;
 }) {
-  const { creatorId, userIds } = payload;
+  const { creatorId, userIds, quizId } = payload;
   const players = await users.findUsers(userIds);
   const creator = await users.findUserById(creatorId);
 
@@ -18,8 +19,9 @@ export async function createGame(payload: {
 
   const entryState = serviceGameStateToEntryGameState(serviceState);
 
-  const game = Game.create({
+  const game = GameEntity.create({
     state: entryState,
+    quizId,
     creator,
   });
   game.players = Promise.resolve(players);
@@ -28,5 +30,5 @@ export async function createGame(payload: {
 }
 
 export async function findGameById(gameId: number) {
-  return Game.findOne(gameId);
+  return GameEntity.findOne(gameId);
 }

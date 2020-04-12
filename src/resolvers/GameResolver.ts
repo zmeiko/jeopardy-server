@@ -7,36 +7,42 @@ import {
   Root,
 } from "type-graphql";
 import * as games from "../controllers/Game.controller";
+import * as quizzes from "../controllers/Quiz.controller";
 import * as users from "../controllers/User.controller";
-import { Game } from "../entity/Game";
+import { GameEntity } from "../entity/Game";
 import { User } from "../entity/User";
 import { CreateNewGameInput } from "../inputs/CreateNewGameInput";
 
-@Resolver(() => Game)
+@Resolver(() => GameEntity)
 export class GameResolver {
-  @Query(() => [Game])
+  @Query(() => [GameEntity])
   games() {
-    return Game.find();
+    return GameEntity.find();
   }
 
-  @Mutation(() => Game)
+  @Mutation(() => GameEntity)
   async createGame(@Arg("data") data: CreateNewGameInput) {
     const game = await games.createGame(data);
     return game;
   }
 
-  @Query(() => Game)
+  @Query(() => GameEntity)
   game(@Arg("id") id: number) {
     return games.findGameById(id);
   }
 
   @FieldResolver()
-  async players(@Root() game: Game) {
+  async players(@Root() game: GameEntity) {
     return await game.players;
   }
 
   @FieldResolver()
-  async creator(@Root() game: Game): Promise<User> {
+  async quiz(@Root() game: GameEntity) {
+    return quizzes.findQuizById(game.quizId);
+  }
+
+  @FieldResolver()
+  async creator(@Root() game: GameEntity): Promise<User> {
     return (await users.findUserById(game.creatorUserId, { cache: 1000 }))!;
   }
 }

@@ -18,6 +18,8 @@ services:
     restart: always
     volumes:
       - ../src:/home/node/app/src
+      - ../scripts:/home/node/app/scripts
+      - ../siq_packages:/home/node/app/siq_packages
     command: yarn nodemon --watch 'src/**/*.ts' --exec node --inspect=0.0.0.0 -r ts-node/register -L ./src/server.ts
     ports:
       - 3000:3000

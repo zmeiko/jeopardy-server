@@ -1,4 +1,4 @@
-import { InputType, Field, Int } from "type-graphql";
+import { Field, InputType, Int } from "type-graphql";
 
 @InputType()
 export class CreateNewGameInput {
@@ -7,4 +7,7 @@ export class CreateNewGameInput {
 
   @Field(() => [Int])
   userIds: number[];
+
+  @Field()
+  quizId: number;
 }

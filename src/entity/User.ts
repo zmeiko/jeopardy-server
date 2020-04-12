@@ -1,12 +1,13 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  BaseEntity,
-  ManyToMany,
-} from "typeorm";
 import { Field, ID, ObjectType } from "type-graphql";
-import { Game } from "./Game";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { GameEntity } from "./Game";
+
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
@@ -22,7 +23,7 @@ export class User extends BaseEntity {
   @Column()
   lastName: string;
 
-  @Field((type) => [Game])
-  @ManyToMany((type) => Game, (game) => game.players)
-  games: Promise<Game[]>;
+  @Field((type) => [GameEntity])
+  @ManyToMany((type) => GameEntity, (game) => game.players)
+  games: Promise<GameEntity[]>;
 }
