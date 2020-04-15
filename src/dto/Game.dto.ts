@@ -6,7 +6,6 @@ import {
   GameSettings,
   GameStatePayload,
 } from "../service/Game";
-import { QuizType } from "../types/Quiz";
 
 export function serviceGameStateToEntryGameState(
   serviceState: GameStatePayload

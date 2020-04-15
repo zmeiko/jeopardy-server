@@ -1,11 +1,13 @@
+import { DeepPartial } from "typeorm";
 import { FindOneOptions } from "typeorm/find-options/FindOneOptions";
 import { QuestionEntity } from "../entity/Question";
 import { QuizEntity } from "../entity/Quiz";
 import { RoundEntity } from "../entity/Round";
 import { ThemeEntity } from "../entity/Theme";
-import { QuizType } from "../types/Quiz";
 
-export async function createQuiz(data: QuizType): Promise<QuizEntity> {
+export async function createQuiz(
+  data: DeepPartial<QuizEntity>
+): Promise<QuizEntity> {
   const quizEntity = QuizEntity.create(data);
   await quizEntity.save();
   return quizEntity;
