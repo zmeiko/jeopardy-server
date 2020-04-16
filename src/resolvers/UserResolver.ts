@@ -9,13 +9,6 @@ export class UserResolver {
     return User.find();
   }
 
-  @Mutation(() => User)
-  async createUser(@Arg("data") data: CreateUserInput) {
-    const user = User.create(data);
-    await user.save();
-    return user;
-  }
-
   @Query(() => User)
   user(@Arg("id") id: string) {
     return User.findOne({ where: { id } });

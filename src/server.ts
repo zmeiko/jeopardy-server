@@ -2,9 +2,15 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-koa";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
+import {
+  extractPayloadFromAccessToken,
+  processTokens,
+} from "./controllers/Auth.controller";
 import * as resolvers from "./resolvers";
 import Koa from "koa";
-import { authChecker } from "./service/Auth";
+import { authChecker, tokensIsEquals } from "./service/Auth";
+import { extractTokens, updateCookies } from "./service/Auth/cookiesManager";
+import { Context } from "./types/Context";
 
 createConnection()
   .then(async () => {
@@ -14,9 +20,21 @@ createConnection()
     });
     const server = new ApolloServer({
       schema,
-      context: (payload: { ctx: Koa.Context }) => {
+      context: async (payload: { ctx: Koa.Context }): Promise<Context> => {
         const { ctx } = payload;
-        return ctx;
+        const oldTokens = extractTokens(ctx.cookies);
+        const newTokens = await processTokens(oldTokens);
+
+        if (!tokensIsEquals(oldTokens, newTokens)) {
+          updateCookies(newTokens, ctx.cookies);
+        }
+
+        let user;
+        const { accessToken } = newTokens;
+        if (accessToken) {
+          user = extractPayloadFromAccessToken(accessToken);
+        }
+        return { ctx, user };
       },
     });
     const app = new Koa();

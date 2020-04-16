@@ -1,52 +1,48 @@
-import * as Cookies from "cookies";
-import {
-  Arg,
-  Authorized,
-  Ctx,
-  Field,
-  InputType,
-  Mutation,
-  ObjectType,
-  Query,
-  Resolver,
-} from "type-graphql";
-import { User } from "../entity/User";
-import { applyToken } from "../service/Auth";
+import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
+import * as auth from "../controllers/Auth.controller";
+import * as users from "../controllers/User.controller";
+import { LoginInput } from "../inputs/Auth/LoginInput";
+import { SignUpInput } from "../inputs/Auth/SignUpInput";
+import { updateCookies } from "../service/Auth/cookiesManager";
+import { Context } from "../types/Context";
 
 @ObjectType()
-class AuthToken {
+class AuthTokens {
   @Field()
-  token: string;
-}
-
-@InputType()
-class AuthTokenInput {
-  @Field()
-  login: string;
+  accessToken: string;
 
   @Field()
-  password: string;
+  refreshToken: string;
 }
 
 @Resolver()
 export class AuthResolver {
-  @Mutation(() => AuthToken)
+  @Mutation(() => AuthTokens)
   async login(
-    @Arg("data") data: AuthTokenInput,
-    @Ctx() context: { cookies: Cookies }
-  ): Promise<AuthToken> {
-    // todo: add check login and password
-    const token = applyToken(1, context.cookies);
+    @Arg("data") data: LoginInput,
+    @Ctx() context: Context
+  ): Promise<AuthTokens> {
+    const isValid = await auth.checkCredentials(data);
+    if (!isValid) {
+      throw new Error("Incorrect username or password");
+    }
+    const { accessToken, refreshToken } = await auth.createTokens(data);
+    updateCookies({ accessToken, refreshToken }, context.ctx.cookies);
     return {
-      token,
+      accessToken,
+      refreshToken,
     };
   }
 
-  @Authorized()
-  @Query(() => AuthToken)
-  checkAuth(@Ctx() ctx: any): AuthToken {
+  @Mutation(() => AuthTokens)
+  async signUp(@Arg("data") data: SignUpInput, @Ctx() context: Context) {
+    const { username } = data;
+    await users.createUser(data);
+    const { accessToken, refreshToken } = await auth.createTokens({ username });
+    updateCookies({ accessToken, refreshToken }, context.ctx.cookies);
     return {
-      token: "t",
+      accessToken,
+      refreshToken,
     };
   }
 }

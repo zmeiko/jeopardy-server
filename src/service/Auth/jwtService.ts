@@ -1,39 +1,60 @@
-import * as Cookies from "cookies";
 import jwt from "jsonwebtoken";
 import { AuthChecker } from "type-graphql";
+import {
+  ACCESS_TOKEN_LIVE_TIME_SEC,
+  ACCESS_JWT_SECRET,
+  REFRESH_JWT_SECRET,
+  REFRESH_TOKEN_LIVE_TIME_SEC,
+} from "../../config/jwt";
+import { Context } from "../../types/Context";
 
-const ACCESS_TOKEN_COOKIE_NAME = "accessToken";
-const ACCESS_TOKEN_LIVE_TIME_SEC = 10 * 60;
-const ACCESS_TOKEN_LIVE_TIME_MS = ACCESS_TOKEN_LIVE_TIME_SEC * 1000;
-const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-const JWT_SECRET = "SECRET"; // todo: add to env
+interface TokenPair {
+  accessToken?: string;
+  refreshToken?: string;
+}
 
-export const authChecker: AuthChecker<{ cookies: Cookies }> = (
-  { context, info },
-  roles
-) => {
-  const token = context.cookies.get(ACCESS_TOKEN_COOKIE_NAME);
-  if (token) {
-    const user = jwt.verify(token, JWT_SECRET);
-    return !!user;
-  }
-  return false;
+export interface AccessTokenPayload {
+  userId: number;
+}
+
+export interface RefreshTokenPayload extends AccessTokenPayload {
+  refreshTokenId: number;
+}
+export const authChecker: AuthChecker<Context> = ({ context, info }, roles) => {
+  return !!context.user.userId;
 };
 
-export function applyToken(userId: number, cookies: Cookies): string {
-  const token = jwt.sign(
-    {
-      userId: userId,
-    },
-    JWT_SECRET,
-    { expiresIn: ACCESS_TOKEN_LIVE_TIME_SEC }
-  );
-  const expires = new Date(new Date().getTime() + ACCESS_TOKEN_LIVE_TIME_MS);
-  cookies.set(ACCESS_TOKEN_COOKIE_NAME, token, {
-    httpOnly: false,
-    sameSite: "lax",
-    expires,
-    overwrite: true,
+export function generateAccessToken(payload: AccessTokenPayload): string {
+  return jwt.sign(payload, ACCESS_JWT_SECRET, {
+    expiresIn: ACCESS_TOKEN_LIVE_TIME_SEC,
   });
-  return token;
+}
+
+export function generateRefreshToken(payload: RefreshTokenPayload): string {
+  return jwt.sign(payload, REFRESH_JWT_SECRET, {
+    expiresIn: REFRESH_TOKEN_LIVE_TIME_SEC,
+  });
+}
+
+export function verifyAccessToken(token: string): AccessTokenPayload | null {
+  try {
+    return jwt.verify(token, ACCESS_JWT_SECRET);
+  } catch (e) {
+    return null;
+  }
+}
+
+export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
+  try {
+    return jwt.verify(token, REFRESH_JWT_SECRET);
+  } catch (e) {
+    return null;
+  }
+}
+
+export function tokensIsEquals(left: TokenPair, right: TokenPair) {
+  return (
+    left.accessToken === right.accessToken &&
+    left.refreshToken === right.refreshToken
+  );
 }

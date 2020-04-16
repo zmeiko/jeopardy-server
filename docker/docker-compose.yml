@@ -20,7 +20,7 @@ services:
       - ../src:/home/node/app/src
       - ../scripts:/home/node/app/scripts
       - ../siq_packages:/home/node/app/siq_packages
-    command: yarn nodemon --watch src/**/*.ts --exec node --inspect=0.0.0.0 -r ts-node/register -L ./src/server.ts
+    command: yarn nodemon --watch src/**/*.ts --exec node --inspect=0.0.0.0 --signal SIGINT -r ts-node/register -L ./src/server.ts
     ports:
       - 4000:3000
       - 9229:9229

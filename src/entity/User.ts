@@ -16,11 +16,27 @@ export class User extends BaseEntity {
   id: number;
 
   @Field()
-  @Column()
+  @Column({
+    unique: true,
+    nullable: false,
+  })
+  username: string;
+
+  @Column({
+    nullable: false,
+  })
+  password: string;
+
+  @Field()
+  @Column({
+    nullable: true,
+  })
   firstName: string;
 
   @Field()
-  @Column()
+  @Column({
+    nullable: true,
+  })
   lastName: string;
 
   @Field((type) => [GameEntity])
