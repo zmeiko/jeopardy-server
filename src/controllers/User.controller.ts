@@ -7,6 +7,10 @@ export async function findUsers(ids: number[]): Promise<User[]> {
   return User.findByIds(ids);
 }
 
+export async function findAll(): Promise<User[]> {
+  return User.find();
+}
+
 export async function findUserById(id: number, options?: FindOneOptions<User>) {
   return User.findOne(id, options);
 }

@@ -15,6 +15,12 @@ class AuthTokens {
   refreshToken: string;
 }
 
+@ObjectType()
+class LogoutResult {
+  @Field()
+  success: boolean;
+}
+
 @Resolver()
 export class AuthResolver {
   @Mutation(() => AuthTokens)
@@ -43,6 +49,21 @@ export class AuthResolver {
     return {
       accessToken,
       refreshToken,
+    };
+  }
+
+  @Mutation(() => LogoutResult)
+  async logout(@Ctx() context: Context) {
+    const userId = context.user?.userId;
+    if (userId) {
+      await auth.logout({ userId });
+    }
+    updateCookies(
+      { accessToken: undefined, refreshToken: undefined },
+      context.ctx.cookies
+    );
+    return {
+      success: true,
     };
   }
 }

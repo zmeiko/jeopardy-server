@@ -70,3 +70,7 @@ export async function processTokens(payload: {
 export function extractPayloadFromAccessToken(accessToken: string) {
   return verifyAccessToken(accessToken);
 }
+
+export async function logout(payload: { userId: number }) {
+  // todo: remove refresh token from db
+}
