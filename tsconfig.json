@@ -8,10 +8,10 @@
     "moduleResolution": "node",
     "outDir": "./dist",
     "esModuleInterop": true,
-    "sourceMap": true,
-    "baseUrl": "./src"
+    "sourceMap": true
   },
   "include": [
+    "./ormconfig.js",
     "./src/**/*"
   ]
 }

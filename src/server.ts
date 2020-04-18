@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-koa";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
+import { PORT } from "./config/server";
 import {
   extractPayloadFromAccessToken,
   processTokens,
@@ -17,9 +18,11 @@ createConnection()
     const schema = await buildSchema({
       resolvers: Object.values(resolvers),
       authChecker: authChecker,
+      validate: false,
     });
     const server = new ApolloServer({
       schema,
+      playground: true,
       context: async (payload: { ctx: Koa.Context }): Promise<Context> => {
         const { ctx } = payload;
         const oldTokens = extractTokens(ctx.cookies);
@@ -40,8 +43,8 @@ createConnection()
     const app = new Koa();
     app.use(server.getMiddleware());
 
-    app.listen(3000, () => {
-      console.log("Koa application is up and running on port 3000");
+    app.listen(PORT, () => {
+      console.log(`Koa application is up and running on port ${PORT}`);
     });
   })
   .catch((error) => console.log("TypeORM connection error: ", error));
