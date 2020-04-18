@@ -1,2 +1,4 @@
 node_modules
-docker
+docker/debug/Dockerfile
+docker/live/Dockerfile
+docker/docker-compose.yml
