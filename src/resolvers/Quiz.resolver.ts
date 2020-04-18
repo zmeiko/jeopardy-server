@@ -1,5 +1,6 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import * as quizzes from "../controllers/Quiz.controller";
+import { QuestionEntity } from "../entity/Question.entry";
 import { QuizEntity } from "../entity/Quiz.entry";
 import { RoundEntity } from "../entity/Round.entry";
 import { ThemeEntity } from "../entity/Theme.entry";
@@ -35,11 +36,12 @@ export class RoundResolver {
 
   @FieldResolver()
   async themes(@Root() round: RoundEntity) {
-    return await ThemeEntity.find({
+    const themes2 = await ThemeEntity.find({
       where: {
         roundId: round.id,
       },
     });
+    return themes2;
   }
 }
 
@@ -52,7 +54,7 @@ export class ThemeResolver {
 
   @FieldResolver()
   async questions(@Root() theme: ThemeEntity) {
-    return await QuizEntity.find({
+    return await QuestionEntity.find({
       where: {
         themeId: theme.id,
       },

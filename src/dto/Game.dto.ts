@@ -60,7 +60,7 @@ export function toGameSettings(payload: {
   return {
     rounds: quiz.rounds,
     playerIds: players.map(({ userId }) => userId),
-    creatorPlayerId: game.creatorUserId,
+    creatorPlayerId: game.creatorId,
     captureTimeoutMs: DEFAULT_SETTINGS.ANSWER_TIMEOUT,
   };
 }

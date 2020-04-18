@@ -105,7 +105,7 @@ export class GameResolver {
   @Authorized()
   @FieldResolver()
   async creator(@Root() game: GameEntity): Promise<UserEntry> {
-    return (await users.findUserById(game.creatorUserId, { cache: 1000 }))!;
+    return (await users.findUserById(game.creatorId, { cache: 1000 }))!;
   }
 
   @Authorized()

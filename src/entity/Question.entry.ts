@@ -16,7 +16,7 @@ export class QuestionEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Column()
   type: string;
 
@@ -40,6 +40,7 @@ export class QuestionEntity extends BaseEntity {
   @ManyToOne(() => ThemeEntity, (theme) => theme.questions)
   theme: ThemeEntity;
 
+  @Column()
   @RelationId((question: QuestionEntity) => question.theme)
   themeId: number;
 }

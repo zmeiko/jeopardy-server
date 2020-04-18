@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import { QuestionEntity } from "./Question.entry";
 import { QuizEntity } from "./Quiz.entry";
@@ -31,4 +32,8 @@ export class ThemeEntity extends BaseEntity {
   @Field((type) => RoundEntity)
   @ManyToOne((type) => RoundEntity, (round) => round.themes)
   round: QuizEntity;
+
+  @Column()
+  @RelationId((theme: ThemeEntity) => theme.round)
+  roundId: number;
 }

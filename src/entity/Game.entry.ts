@@ -1,6 +1,7 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -25,8 +26,9 @@ export class GameEntity extends BaseEntity {
   @ManyToOne(() => UserEntry)
   creator: UserEntry;
 
+  @Column()
   @RelationId((game: GameEntity) => game.creator)
-  creatorUserId: number;
+  creatorId: number;
 
   @Field(() => GameStateEntry)
   @OneToOne((type) => GameStateEntry, { cascade: true })
@@ -40,6 +42,7 @@ export class GameEntity extends BaseEntity {
   @ManyToOne((type) => QuizEntity, { nullable: false })
   quiz: QuizEntity;
 
+  @Column()
   @RelationId((game: GameEntity) => game.quiz)
   quizId: number;
 
