@@ -4,3 +4,4 @@ export * from "./GameStateResolver";
 export * from "./QuizResolver";
 export * from "./Auth.resolver";
 export * from "./Room.resolver";
+export * from "./Player.resolver";

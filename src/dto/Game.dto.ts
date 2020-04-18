@@ -1,4 +1,5 @@
 import { GameEntity, GameStateEntry } from "../entity/Game";
+import { PlayerEntry } from "../entity/Player";
 import { QuizEntity } from "../entity/Quiz";
 import { User } from "../entity/User";
 import {
@@ -48,7 +49,7 @@ export function entryGameStateToServiceGameState(
 export function extractGameSettingsFromEntry(payload: {
   game: GameEntity;
   quiz: QuizEntity;
-  players: User[];
+  players: PlayerEntry[];
 }): GameSettings {
   const { game, players, quiz } = payload;
   return {

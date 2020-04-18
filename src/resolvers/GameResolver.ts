@@ -1,6 +1,7 @@
 import {
   Arg,
   Authorized,
+  Ctx,
   FieldResolver,
   Mutation,
   Query,
@@ -19,6 +20,7 @@ import {
   SelectQuestionInput,
   CaptureQuestionInput,
 } from "../inputs/Game";
+import { Context } from "../types/Context";
 
 @Resolver(() => GameEntity)
 export class GameResolver {
@@ -30,8 +32,12 @@ export class GameResolver {
 
   @Authorized()
   @Mutation(() => GameEntity)
-  async createGame(@Arg("data") data: CreateNewGameInput) {
-    const game = await games.createGame(data);
+  async createGame(@Arg("data") data: CreateNewGameInput, @Ctx() ctx: Context) {
+    const creatorId = ctx.user.userId!;
+    const game = await games.createGame({
+      ...data,
+      creatorId,
+    });
     return game;
   }
 

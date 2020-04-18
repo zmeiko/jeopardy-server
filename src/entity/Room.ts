@@ -23,5 +23,5 @@ export class RoomEntity extends BaseEntity {
   @Field(() => [User])
   @ManyToMany((type) => User)
   @JoinTable()
-  players: Promise<User[]>;
+  users: Promise<User[]>;
 }

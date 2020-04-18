@@ -5,25 +5,25 @@ import {
   serviceGameStateToEntryGameState,
 } from "../dto/Game.dto";
 import { GameEntity } from "../entity/Game";
-import GameService, {
-  GameSettings,
-  GameState,
-  GameStatePayload,
-} from "../service/Game";
+import { PlayerEntry } from "../entity/Player";
+import GameService, { GameSettings, GameStatePayload } from "../service/Game";
 import * as users from "./User.controller";
+import * as rooms from "./Room.controller";
 import * as quizzes from "./Quiz.controller";
 
 export async function createGame(payload: {
   creatorId: number;
-  userIds: number[];
+  roomId: number;
   quizId: number;
 }) {
-  const { creatorId, userIds, quizId } = payload;
-  const players = await users.findUsers(userIds);
+  const { creatorId, roomId, quizId } = payload;
+  const room = await rooms.findRoomById(roomId);
+  const quiz = await quizzes.findQuizById(quizId);
+  const gameUsers = await room.users;
   const creator = await users.findUserById(creatorId);
 
   const serviceState = GameService.createInitialState({
-    playerIds: players.map(({ id }) => id),
+    playerIds: gameUsers.map(({ id }) => id),
     firstRoundId: 1,
   });
 
@@ -31,11 +31,22 @@ export async function createGame(payload: {
 
   const game = GameEntity.create({
     state: entryState,
-    quizId,
+    quiz,
     creator,
   });
-  game.players = Promise.resolve(players);
+
+  game.players = Promise.resolve(
+    gameUsers.map(
+      (user): PlayerEntry =>
+        PlayerEntry.create({
+          userId: user.id,
+          score: 0,
+        })
+    )
+  );
+
   await game.save();
+
   return game;
 }
 

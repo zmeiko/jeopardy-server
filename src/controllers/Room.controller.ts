@@ -11,8 +11,8 @@ export async function joinToRoom(payload: { userId: number; roomId: number }) {
   const { roomId, userId } = payload;
   const room = await RoomEntity.findOne(roomId);
   const user = await users.findUserById(userId);
-  const players = await room.players;
-  room.players = Promise.resolve([...players, user]);
+  const players = await room.users;
+  room.users = Promise.resolve([...players, user]);
   await room.save();
   return room;
 }
@@ -20,8 +20,8 @@ export async function joinToRoom(payload: { userId: number; roomId: number }) {
 export async function leaveRoom(payload: { userId: number; roomId: number }) {
   const { roomId, userId } = payload;
   const room = await RoomEntity.findOne(roomId);
-  const players = await room.players;
-  room.players = Promise.resolve(players.filter((user) => user.id !== userId));
+  const players = await room.users;
+  room.users = Promise.resolve(players.filter((user) => user.id !== userId));
   await room.save();
   return room;
 }
@@ -29,4 +29,9 @@ export async function leaveRoom(payload: { userId: number; roomId: number }) {
 export async function findAll() {
   const rooms = await RoomEntity.find();
   return rooms;
+}
+
+export async function findRoomById(roomId: number) {
+  const room = await RoomEntity.findOne(roomId);
+  return room;
 }

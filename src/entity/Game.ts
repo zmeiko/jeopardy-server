@@ -7,10 +7,12 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
 import { GameStatePayload, PlayerScore } from "../service/Game";
+import { PlayerEntry } from "./Player";
 import { QuizEntity } from "./Quiz";
 import { User } from "./User";
 
@@ -83,7 +85,7 @@ export class GameEntity extends BaseEntity {
   @ManyToOne(() => User)
   creator: User;
 
-  @RelationId((game: GameEntity) => game.creator) // you need to specify target relation
+  @RelationId((game: GameEntity) => game.creator)
   creatorUserId: number;
 
   @Field(() => GameStateEntry)
@@ -98,11 +100,12 @@ export class GameEntity extends BaseEntity {
   @ManyToOne((type) => QuizEntity, { nullable: false })
   quiz: QuizEntity;
 
-  @RelationId((game: GameEntity) => game.quiz) // you need to specify target relation
+  @RelationId((game: GameEntity) => game.quiz)
   quizId: number;
 
-  @Field(() => [User])
-  @ManyToMany((type) => User, (user) => user.games)
-  @JoinTable()
-  players: Promise<User[]>;
+  @Field(() => [PlayerEntry])
+  @OneToMany((type) => PlayerEntry, (player) => player.game, {
+    cascade: true,
+  })
+  players: Promise<PlayerEntry[]>;
 }

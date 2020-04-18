@@ -16,8 +16,8 @@ import { Context } from "../types/Context";
 export class RoomResolver {
   @Authorized()
   @FieldResolver()
-  async players(@Root() room: RoomEntity) {
-    return await room.players;
+  async users(@Root() room: RoomEntity) {
+    return await room.users;
   }
 
   @Authorized()

@@ -38,8 +38,4 @@ export class User extends BaseEntity {
     nullable: true,
   })
   lastName: string;
-
-  @Field((type) => [GameEntity])
-  @ManyToMany((type) => GameEntity, (game) => game.players)
-  games: Promise<GameEntity[]>;
 }

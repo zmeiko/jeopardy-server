@@ -3,7 +3,7 @@ import { BCRYPT_SALT } from "../config/secret";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
 
-export async function findUsers(ids: number[]): Promise<User[]> {
+export async function findUsersByIds(ids: number[]): Promise<User[]> {
   return User.findByIds(ids);
 }
 
