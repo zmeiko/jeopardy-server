@@ -3,7 +3,7 @@ import {
   generateRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
-} from "../service/Auth";
+} from "../service/auth";
 import * as users from "./User.controller";
 
 interface TokenPair {

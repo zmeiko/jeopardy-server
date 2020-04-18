@@ -8,8 +8,8 @@ import {
 } from "./controllers/Auth.controller";
 import * as resolvers from "./resolvers";
 import Koa from "koa";
-import { authChecker, tokensIsEquals } from "./service/Auth";
-import { extractTokens, updateCookies } from "./service/Auth/cookiesManager";
+import { authChecker, tokensIsEquals } from "./service/auth";
+import { extractTokens, updateCookies } from "./service/auth/cookies";
 import { Context } from "./types/Context";
 
 createConnection()

@@ -1,9 +1,9 @@
 import * as Cookies from "cookies";
 import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  ACCESS_TOKEN_LIVE_TIME_MS,
-  REFRESH_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_LIVE_TIME_MS,
+  JWT_ACCESS_TOKEN_COOKIE_NAME,
+  JWT_ACCESS_TOKEN_LIVE_TIME_MS,
+  JWT_REFRESH_TOKEN_COOKIE_NAME,
+  JWT_REFRESH_TOKEN_LIVE_TIME_MS,
 } from "../../config/jwt";
 
 export function updateCookies(
@@ -14,16 +14,16 @@ export function updateCookies(
   cookies: Cookies
 ): void {
   const now = new Date().getTime();
-  const expiresAccessToken = new Date(now + ACCESS_TOKEN_LIVE_TIME_MS);
-  cookies.set(ACCESS_TOKEN_COOKIE_NAME, payload.accessToken, {
+  const expiresAccessToken = new Date(now + JWT_ACCESS_TOKEN_LIVE_TIME_MS);
+  cookies.set(JWT_ACCESS_TOKEN_COOKIE_NAME, payload.accessToken, {
     httpOnly: true,
     sameSite: "lax",
     expires: expiresAccessToken,
     overwrite: true,
   });
 
-  const expiresRefreshToken = new Date(now + REFRESH_TOKEN_LIVE_TIME_MS);
-  cookies.set(REFRESH_TOKEN_COOKIE_NAME, payload.refreshToken, {
+  const expiresRefreshToken = new Date(now + JWT_REFRESH_TOKEN_LIVE_TIME_MS);
+  cookies.set(JWT_REFRESH_TOKEN_COOKIE_NAME, payload.refreshToken, {
     httpOnly: true,
     sameSite: "lax",
     expires: expiresRefreshToken,
@@ -37,8 +37,8 @@ export function extractTokens(
   accessToken?: string;
   refreshToken?: string;
 } {
-  const accessToken = cookies.get(ACCESS_TOKEN_COOKIE_NAME);
-  const refreshToken = cookies.get(REFRESH_TOKEN_COOKIE_NAME);
+  const accessToken = cookies.get(JWT_ACCESS_TOKEN_COOKIE_NAME);
+  const refreshToken = cookies.get(JWT_REFRESH_TOKEN_COOKIE_NAME);
   return {
     accessToken,
     refreshToken,

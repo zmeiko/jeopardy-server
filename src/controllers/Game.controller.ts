@@ -7,7 +7,7 @@ import {
 import { GameEntity } from "../entity/Game.entry";
 import { GameStateEntry } from "../entity/GameState.entry";
 import { PlayerEntry } from "../entity/Player.entry";
-import GameService, { GameSettings, GameStatePayload } from "../service/Game";
+import GameService, { GameSettings, GameStatePayload } from "../service/game";
 import * as users from "./User.controller";
 import * as rooms from "./Room.controller";
 import * as quizzes from "./Quiz.controller";

@@ -20,7 +20,7 @@ import {
   SelectFirstPlayerInput,
   SelectQuestionInput,
   CaptureQuestionInput,
-} from "../inputs/Game";
+} from "../inputs/game";
 import { Context } from "../types/Context";
 
 @Resolver(() => GameEntity)

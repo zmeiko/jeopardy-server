@@ -1,9 +1,9 @@
 import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
 import * as auth from "../controllers/Auth.controller";
 import * as users from "../controllers/User.controller";
-import { LoginInput } from "../inputs/Auth/LoginInput";
-import { SignUpInput } from "../inputs/Auth/SignUpInput";
-import { updateCookies } from "../service/Auth/cookiesManager";
+import { LoginInput } from "../inputs/auth/LoginInput";
+import { SignUpInput } from "../inputs/auth/SignUpInput";
+import { updateCookies } from "../service/auth/cookies";
 import { Context } from "../types/Context";
 
 @ObjectType()

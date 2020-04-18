@@ -7,7 +7,7 @@ import {
   DEFAULT_SETTINGS,
   GameSettings,
   GameStatePayload,
-} from "../service/Game";
+} from "../service/game";
 
 export function serviceGameStateToEntryGameState(
   serviceState: GameStatePayload

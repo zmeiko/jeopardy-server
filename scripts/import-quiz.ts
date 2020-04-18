@@ -2,7 +2,7 @@ import fs from "fs";
 import { createConnection } from "typeorm";
 import parser from "xml2json";
 import { createQuiz } from "../src/controllers/Quiz.controller";
-import { QuestionType, RoundType, ThemeType } from "../src/service/Game";
+import { QuestionType, RoundType, ThemeType } from "../src/service/game";
 
 const PACKAGE_DIR = "./siq_packages";
 const packageName = "Turnirny_paket_3";

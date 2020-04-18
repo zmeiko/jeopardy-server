@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 import { AuthChecker } from "type-graphql";
 import {
-  ACCESS_TOKEN_LIVE_TIME_SEC,
-  ACCESS_JWT_SECRET,
-  REFRESH_JWT_SECRET,
-  REFRESH_TOKEN_LIVE_TIME_SEC,
+  JWT_ACCESS_TOKEN_LIVE_TIME_SEC,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+  JWT_REFRESH_TOKEN_LIVE_TIME_SEC,
 } from "../../config/jwt";
 
 interface TokenPair {
@@ -21,20 +21,20 @@ export interface RefreshTokenPayload extends AccessTokenPayload {
 }
 
 export function generateAccessToken(payload: AccessTokenPayload): string {
-  return jwt.sign(payload, ACCESS_JWT_SECRET, {
-    expiresIn: ACCESS_TOKEN_LIVE_TIME_SEC,
+  return jwt.sign(payload, JWT_ACCESS_SECRET, {
+    expiresIn: JWT_ACCESS_TOKEN_LIVE_TIME_SEC,
   });
 }
 
 export function generateRefreshToken(payload: RefreshTokenPayload): string {
-  return jwt.sign(payload, REFRESH_JWT_SECRET, {
-    expiresIn: REFRESH_TOKEN_LIVE_TIME_SEC,
+  return jwt.sign(payload, JWT_REFRESH_SECRET, {
+    expiresIn: JWT_REFRESH_TOKEN_LIVE_TIME_SEC,
   });
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload | null {
   try {
-    return jwt.verify(token, ACCESS_JWT_SECRET);
+    return jwt.verify(token, JWT_ACCESS_SECRET);
   } catch (e) {
     return null;
   }
@@ -42,7 +42,7 @@ export function verifyAccessToken(token: string): AccessTokenPayload | null {
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
   try {
-    return jwt.verify(token, REFRESH_JWT_SECRET);
+    return jwt.verify(token, JWT_REFRESH_SECRET);
   } catch (e) {
     return null;
   }
