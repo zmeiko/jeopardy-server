@@ -1,78 +1,18 @@
-import { Field, ID, Int, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType } from "type-graphql";
 import {
   BaseEntity,
-  Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
-import { GameStatePayload, PlayerScore } from "../service/Game";
+import { GameStateEntry } from "./GameState";
 import { PlayerEntry } from "./Player";
 import { QuizEntity } from "./Quiz";
 import { User } from "./User";
-
-@ObjectType("PlayerScore")
-export class PlayerScoreEntry implements PlayerScore {
-  @Field()
-  playerId: number;
-
-  @Field((type) => User)
-  player: User;
-
-  @Field()
-  score: number;
-}
-
-@ObjectType("GameState")
-export class GameStateEntry implements GameStatePayload {
-  @Field()
-  stateName: string | null;
-
-  @Field()
-  currentRoundId: number;
-
-  @Field({
-    nullable: true,
-  })
-  currentPlayerId: number | null;
-
-  @Field({
-    nullable: true,
-  })
-  selectedQuestionId: number | null;
-
-  @Field({
-    nullable: true,
-  })
-  answeringPlayerId: number | null;
-
-  @Field((type) => User, { nullable: true })
-  answeringPlayer?: User;
-
-  @Field(() => [Int])
-  readonly answeredPlayerIds: number[];
-
-  @Field({
-    nullable: true,
-  })
-  readonly cardSelectionAt: Date | null;
-
-  @Field({
-    nullable: true,
-  })
-  readonly questionCaptureAt?: Date | null;
-
-  @Field(() => [Int])
-  readonly openedQuestionsIds: number[];
-
-  @Field(() => [PlayerScoreEntry])
-  readonly playerScores: PlayerScore[]; //userId-score
-}
 
 @ObjectType("Game")
 @Entity("game")
@@ -89,7 +29,7 @@ export class GameEntity extends BaseEntity {
   creatorUserId: number;
 
   @Field(() => GameStateEntry)
-  @Column({ type: "jsonb" })
+  @OneToOne((type) => GameStateEntry, { cascade: true })
   state: GameStateEntry;
 
   @Field()

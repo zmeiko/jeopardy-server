@@ -12,6 +12,7 @@ import * as games from "../controllers/Game.controller";
 import * as quizzes from "../controllers/Quiz.controller";
 import * as users from "../controllers/User.controller";
 import { GameEntity } from "../entity/Game";
+import { GameStateEntry } from "../entity/GameState";
 import { User } from "../entity/User";
 import {
   CreateNewGameInput,
@@ -27,7 +28,7 @@ export class GameResolver {
   @Authorized()
   @Query(() => [GameEntity])
   games() {
-    return GameEntity.find();
+    return games.findAll();
   }
 
   @Authorized()
@@ -105,5 +106,11 @@ export class GameResolver {
   @FieldResolver()
   async creator(@Root() game: GameEntity): Promise<User> {
     return (await users.findUserById(game.creatorUserId, { cache: 1000 }))!;
+  }
+
+  @Authorized()
+  @FieldResolver()
+  async state(@Root() game: GameEntity): Promise<GameStateEntry> {
+    return (await games.findGameStateByGameId(game.id))!;
   }
 }

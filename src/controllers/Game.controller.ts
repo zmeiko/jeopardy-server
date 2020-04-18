@@ -1,15 +1,20 @@
 import { FindOneOptions } from "typeorm";
 import {
-  entryGameStateToServiceGameState,
-  extractGameSettingsFromEntry,
+  toServiceGameState,
+  toGameSettings,
   serviceGameStateToEntryGameState,
 } from "../dto/Game.dto";
 import { GameEntity } from "../entity/Game";
+import { GameStateEntry } from "../entity/GameState";
 import { PlayerEntry } from "../entity/Player";
 import GameService, { GameSettings, GameStatePayload } from "../service/Game";
 import * as users from "./User.controller";
 import * as rooms from "./Room.controller";
 import * as quizzes from "./Quiz.controller";
+
+export async function findAll() {
+  return GameEntity.find();
+}
 
 export async function createGame(payload: {
   creatorId: number;
@@ -22,15 +27,17 @@ export async function createGame(payload: {
   const gameUsers = await room.users;
   const creator = await users.findUserById(creatorId);
 
-  const serviceState = GameService.createInitialState({
+  const stateService = GameService.createInitialState({
     playerIds: gameUsers.map(({ id }) => id),
     firstRoundId: 1,
   });
 
-  const entryState = serviceGameStateToEntryGameState(serviceState);
+  const stateEntry = GameStateEntry.create(
+    serviceGameStateToEntryGameState(stateService)
+  );
 
   const game = GameEntity.create({
-    state: entryState,
+    state: stateEntry,
     quiz,
     creator,
   });
@@ -53,16 +60,25 @@ export async function createGame(payload: {
 export async function findGameById(
   gameId: number,
   options?: FindOneOptions<GameEntity>
-) {
+): Promise<GameEntity | undefined> {
   return GameEntity.findOne(gameId, options);
+}
+
+export async function findGameStateByGameId(gameId: number) {
+  return GameStateEntry.findOne({
+    where: {
+      gameId,
+    },
+  });
 }
 
 async function getStateAndSettingsByGameId(gameId: number) {
   const gameEntry = await findGameById(gameId, { cache: 1000 });
+  const stateEntry = await findGameStateByGameId(gameEntry.id);
   const players = await gameEntry.players;
   const quiz = await quizzes.findFullQuizById(gameEntry.quizId);
-  const currentGameState: GameStatePayload = gameEntry.state;
-  const gameSettings: GameSettings = extractGameSettingsFromEntry({
+
+  const gameSettings: GameSettings = toGameSettings({
     game: gameEntry,
     players,
     quiz,
@@ -70,8 +86,51 @@ async function getStateAndSettingsByGameId(gameId: number) {
 
   return {
     settings: gameSettings,
-    state: entryGameStateToServiceGameState(currentGameState),
+    state: toServiceGameState({ entryGameState: stateEntry, players }),
   };
+}
+
+async function saveNewGameState(payload: {
+  gameId: number;
+  state: GameStatePayload;
+}): Promise<GameEntity> {
+  const { gameId, state } = payload;
+  const gameEntry = await findGameById(gameId);
+
+  let stateEntry = await findGameStateByGameId(gameEntry.id);
+  const newEntryState = serviceGameStateToEntryGameState(state);
+  stateEntry = GameStateEntry.merge(stateEntry, newEntryState);
+  await stateEntry.save();
+
+  // Update scores
+  await Promise.all(
+    state.playerScores.map((servicePlayer) =>
+      PlayerEntry.update(
+        {
+          userId: servicePlayer.playerId,
+          gameId,
+        },
+        {
+          score: servicePlayer.score,
+        }
+      )
+    )
+  );
+
+  return gameEntry;
+}
+
+type GameAction = ({
+  settings: GameSettings,
+  state: GameStatePayload,
+}) => Promise<GameStatePayload>;
+
+async function makeGameAction(payload: { gameId: number }, action: GameAction) {
+  const { gameId } = payload;
+  const { settings, state } = await getStateAndSettingsByGameId(gameId);
+  const newState = await action({ settings, state });
+  const game = await saveNewGameState({ gameId, state: newState });
+  return game;
 }
 
 export async function selectFirstPlayer(payload: {
@@ -79,20 +138,15 @@ export async function selectFirstPlayer(payload: {
   playerId: number;
 }): Promise<GameEntity> {
   const { gameId, playerId } = payload;
-  const gameEntry = await findGameById(gameId, { cache: 1000 });
-  const { settings, state } = await getStateAndSettingsByGameId(gameId);
-
-  const nextState = GameService.selectFirstPlayer(
-    {
-      playerId,
-    },
-    state,
-    settings
+  return await makeGameAction({ gameId }, async ({ state, settings }) =>
+    GameService.selectFirstPlayer(
+      {
+        playerId,
+      },
+      state,
+      settings
+    )
   );
-
-  gameEntry.state = serviceGameStateToEntryGameState(nextState);
-  await gameEntry.save();
-  return gameEntry;
 }
 
 export async function selectQuestion(payload: {
@@ -101,21 +155,16 @@ export async function selectQuestion(payload: {
   questionId: number;
 }): Promise<GameEntity> {
   const { gameId, playerId, questionId } = payload;
-  const gameEntry = await findGameById(gameId, { cache: 1000 });
-  const { settings, state } = await getStateAndSettingsByGameId(gameId);
-
-  const nextState = GameService.selectQuestion(
-    {
-      playerId,
-      questionId,
-    },
-    state,
-    settings
+  return await makeGameAction({ gameId }, async ({ state, settings }) =>
+    GameService.selectQuestion(
+      {
+        playerId,
+        questionId,
+      },
+      state,
+      settings
+    )
   );
-
-  gameEntry.state = serviceGameStateToEntryGameState(nextState);
-  await gameEntry.save();
-  return gameEntry;
 }
 
 export async function captureQuestion(payload: {
@@ -123,20 +172,15 @@ export async function captureQuestion(payload: {
   playerId: number;
 }): Promise<GameEntity> {
   const { gameId, playerId } = payload;
-  const gameEntry = await findGameById(gameId, { cache: 1000 });
-  const { settings, state } = await getStateAndSettingsByGameId(gameId);
-
-  const nextState = GameService.captureQuestion(
-    {
-      playerId,
-    },
-    state,
-    settings
+  return await makeGameAction({ gameId }, async ({ state, settings }) =>
+    GameService.captureQuestion(
+      {
+        playerId,
+      },
+      state,
+      settings
+    )
   );
-
-  gameEntry.state = serviceGameStateToEntryGameState(nextState);
-  await gameEntry.save();
-  return gameEntry;
 }
 
 export async function answer(payload: {
@@ -145,19 +189,14 @@ export async function answer(payload: {
   answer: string;
 }): Promise<GameEntity> {
   const { gameId, playerId, answer } = payload;
-  const gameEntry = await findGameById(gameId, { cache: 1000 });
-  const { settings, state } = await getStateAndSettingsByGameId(gameId);
-
-  const nextState = GameService.answer(
-    {
-      playerId,
-      answer,
-    },
-    state,
-    settings
+  return await makeGameAction({ gameId }, async ({ state, settings }) =>
+    GameService.answer(
+      {
+        playerId,
+        answer,
+      },
+      state,
+      settings
+    )
   );
-
-  gameEntry.state = serviceGameStateToEntryGameState(nextState);
-  await gameEntry.save();
-  return gameEntry;
 }
