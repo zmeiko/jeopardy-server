@@ -1,8 +1,8 @@
 import { DeepPartial } from "typeorm";
-import { GameEntity } from "../entity/Game";
-import { GameStateEntry } from "../entity/GameState";
-import { PlayerEntry } from "../entity/Player";
-import { QuizEntity } from "../entity/Quiz";
+import { GameEntity } from "../entity/Game.entry";
+import { GameStateEntry } from "../entity/GameState.entry";
+import { PlayerEntry } from "../entity/Player.entry";
+import { QuizEntity } from "../entity/Quiz.entry";
 import {
   DEFAULT_SETTINGS,
   GameSettings,

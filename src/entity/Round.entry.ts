@@ -7,10 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { QuizEntity } from "./Quiz";
-import { ThemeEntity } from "./Theme";
+import { QuizEntity } from "./Quiz.entry";
+import { ThemeEntity } from "./Theme.entry";
 
-@ObjectType()
+@ObjectType("Round")
 @Entity("round")
 export class RoundEntity extends BaseEntity {
   @Field(() => ID)

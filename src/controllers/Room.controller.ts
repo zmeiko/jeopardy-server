@@ -1,4 +1,4 @@
-import { RoomEntity } from "../entity/Room";
+import { RoomEntity } from "../entity/Room.entry";
 import * as users from "./User.controller";
 
 export async function createRoom(payload: { name: string }) {

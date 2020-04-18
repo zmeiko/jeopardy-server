@@ -8,8 +8,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { GameEntity } from "./Game";
-import { User } from "./User";
+import { GameEntity } from "./Game.entry";
+import { UserEntry } from "./User.entry";
 
 @ObjectType("Player")
 @Entity("player")
@@ -33,8 +33,8 @@ export class PlayerEntry extends BaseEntity {
   @JoinColumn()
   public game!: GameEntity;
 
-  @Field(() => User)
-  @ManyToOne((type) => User)
+  @Field(() => UserEntry)
+  @ManyToOne((type) => UserEntry)
   @JoinColumn()
-  public user!: User;
+  public user!: UserEntry;
 }

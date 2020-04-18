@@ -1,18 +1,21 @@
 import { FindOneOptions } from "typeorm/find-options/FindOneOptions";
 import { BCRYPT_SALT } from "../config/secret";
-import { User } from "../entity/User";
+import { UserEntry } from "../entity/User.entry";
 import bcrypt from "bcrypt";
 
-export async function findUsersByIds(ids: number[]): Promise<User[]> {
-  return User.findByIds(ids);
+export async function findUsersByIds(ids: number[]): Promise<UserEntry[]> {
+  return UserEntry.findByIds(ids);
 }
 
-export async function findAll(): Promise<User[]> {
-  return User.find();
+export async function findAll(): Promise<UserEntry[]> {
+  return UserEntry.find();
 }
 
-export async function findUserById(id: number, options?: FindOneOptions<User>) {
-  return User.findOne(id, options);
+export async function findUserById(
+  id: number,
+  options?: FindOneOptions<UserEntry>
+) {
+  return UserEntry.findOne(id, options);
 }
 
 export async function createUser(payload: {
@@ -21,7 +24,7 @@ export async function createUser(payload: {
 }) {
   const { username, password } = payload;
   const hashPassword = await bcrypt.hash(password, BCRYPT_SALT);
-  const user = User.create({
+  const user = UserEntry.create({
     username,
     password: hashPassword,
   });
@@ -30,7 +33,7 @@ export async function createUser(payload: {
 }
 
 export async function findUserByUsername(username: string) {
-  return await User.findOne({
+  return await UserEntry.findOne({
     where: {
       username,
     },

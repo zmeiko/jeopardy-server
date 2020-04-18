@@ -7,9 +7,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { QuestionEntity } from "./Question";
-import { QuizEntity } from "./Quiz";
-import { RoundEntity } from "./Round";
+import { QuestionEntity } from "./Question.entry";
+import { QuizEntity } from "./Quiz.entry";
+import { RoundEntity } from "./Round.entry";
 
 @ObjectType("Theme")
 @Entity("theme")

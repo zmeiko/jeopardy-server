@@ -9,10 +9,10 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
-import { GameStateEntry } from "./GameState";
-import { PlayerEntry } from "./Player";
-import { QuizEntity } from "./Quiz";
-import { User } from "./User";
+import { GameStateEntry } from "./GameState.entry";
+import { PlayerEntry } from "./Player.entry";
+import { QuizEntity } from "./Quiz.entry";
+import { UserEntry } from "./User.entry";
 
 @ObjectType("Game")
 @Entity("game")
@@ -21,9 +21,9 @@ export class GameEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
-  creator: User;
+  @Field(() => UserEntry)
+  @ManyToOne(() => UserEntry)
+  creator: UserEntry;
 
   @RelationId((game: GameEntity) => game.creator)
   creatorUserId: number;

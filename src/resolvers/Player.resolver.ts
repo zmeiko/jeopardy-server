@@ -1,7 +1,7 @@
 import { FieldResolver, Resolver, Root } from "type-graphql";
 import * as games from "../controllers/Game.controller";
 import * as users from "../controllers/User.controller";
-import { PlayerEntry } from "../entity/Player";
+import { PlayerEntry } from "../entity/Player.entry";
 
 @Resolver(() => PlayerEntry)
 export class PlayerResolver {

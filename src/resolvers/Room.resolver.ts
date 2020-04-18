@@ -9,7 +9,7 @@ import {
   Root,
 } from "type-graphql";
 import * as rooms from "../controllers/Room.controller";
-import { RoomEntity } from "../entity/Room";
+import { RoomEntity } from "../entity/Room.entry";
 import { Context } from "../types/Context";
 
 @Resolver(() => RoomEntity)

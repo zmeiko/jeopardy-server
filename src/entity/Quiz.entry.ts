@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { RoundEntity } from "./Round";
+import { RoundEntity } from "./Round.entry";
 
 @ObjectType("Quiz")
 @Entity("quiz")

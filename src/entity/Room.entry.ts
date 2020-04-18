@@ -7,7 +7,7 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { User } from "./User";
+import { UserEntry } from "./User.entry";
 
 @ObjectType("Room")
 @Entity("room")
@@ -20,8 +20,8 @@ export class RoomEntity extends BaseEntity {
   @Column()
   name: string;
 
-  @Field(() => [User])
-  @ManyToMany((type) => User)
+  @Field(() => [UserEntry])
+  @ManyToMany((type) => UserEntry)
   @JoinTable()
-  users: Promise<User[]>;
+  users: Promise<UserEntry[]>;
 }

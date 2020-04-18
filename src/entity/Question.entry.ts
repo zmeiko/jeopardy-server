@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
-import { ThemeEntity } from "./Theme";
+import { ThemeEntity } from "./Theme.entry";
 
 @ObjectType()
 @Entity("question")

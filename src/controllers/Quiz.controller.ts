@@ -1,9 +1,9 @@
 import { DeepPartial } from "typeorm";
 import { FindOneOptions } from "typeorm/find-options/FindOneOptions";
-import { QuestionEntity } from "../entity/Question";
-import { QuizEntity } from "../entity/Quiz";
-import { RoundEntity } from "../entity/Round";
-import { ThemeEntity } from "../entity/Theme";
+import { QuestionEntity } from "../entity/Question.entry";
+import { QuizEntity } from "../entity/Quiz.entry";
+import { RoundEntity } from "../entity/Round.entry";
+import { ThemeEntity } from "../entity/Theme.entry";
 
 export async function createQuiz(
   data: DeepPartial<QuizEntity>

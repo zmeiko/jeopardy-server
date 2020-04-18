@@ -1,8 +1,8 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import * as quizzes from "../controllers/Quiz.controller";
-import { QuizEntity } from "../entity/Quiz";
-import { RoundEntity } from "../entity/Round";
-import { ThemeEntity } from "../entity/Theme";
+import { QuizEntity } from "../entity/Quiz.entry";
+import { RoundEntity } from "../entity/Round.entry";
+import { ThemeEntity } from "../entity/Theme.entry";
 
 @Resolver(() => QuizEntity)
 export class QuizResolver {

@@ -7,8 +7,8 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { GameEntity } from "./Game";
-import { User } from "./User";
+import { GameEntity } from "./Game.entry";
+import { UserEntry } from "./User.entry";
 
 @ObjectType("GameState")
 @Entity("game_state")
@@ -57,8 +57,8 @@ export class GameStateEntry extends BaseEntity {
   })
   answeringPlayerId: number | null;
 
-  @Field((type) => User, { nullable: true })
-  answeringPlayer?: User;
+  @Field((type) => UserEntry, { nullable: true })
+  answeringPlayer?: UserEntry;
 
   @Field(() => [Int])
   @Column({

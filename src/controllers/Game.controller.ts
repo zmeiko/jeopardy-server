@@ -4,9 +4,9 @@ import {
   toGameSettings,
   serviceGameStateToEntryGameState,
 } from "../dto/Game.dto";
-import { GameEntity } from "../entity/Game";
-import { GameStateEntry } from "../entity/GameState";
-import { PlayerEntry } from "../entity/Player";
+import { GameEntity } from "../entity/Game.entry";
+import { GameStateEntry } from "../entity/GameState.entry";
+import { PlayerEntry } from "../entity/Player.entry";
 import GameService, { GameSettings, GameStatePayload } from "../service/Game";
 import * as users from "./User.controller";
 import * as rooms from "./Room.controller";
