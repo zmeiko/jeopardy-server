@@ -5,6 +5,7 @@ import { LoginInput } from "../inputs/auth/LoginInput";
 import { SignUpInput } from "../inputs/auth/SignUpInput";
 import { updateCookies } from "../service/auth/cookies";
 import { Context } from "../types/Context";
+import { UserInputError } from "apollo-server-koa";
 
 @ObjectType()
 class AuthTokens {
@@ -30,7 +31,7 @@ export class AuthResolver {
   ): Promise<AuthTokens> {
     const isValid = await auth.checkCredentials(data);
     if (!isValid) {
-      throw new Error("Incorrect username or password");
+      throw new UserInputError("Incorrect username or password");
     }
     const { accessToken, refreshToken } = await auth.createTokens(data);
     updateCookies({ accessToken, refreshToken }, context.ctx.cookies);
