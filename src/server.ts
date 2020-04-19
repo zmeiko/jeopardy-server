@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-koa";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
-import { PORT } from "./config/server";
+import { CORS_ORIGIN, PORT } from "./config/server";
 import {
   extractPayloadFromAccessToken,
   processTokens,
@@ -41,7 +41,14 @@ createConnection()
       },
     });
     const app = new Koa();
-    app.use(server.getMiddleware());
+    app.use(
+      server.getMiddleware({
+        cors: {
+          credentials: true,
+          origin: CORS_ORIGIN,
+        },
+      })
+    );
 
     app.listen(PORT, () => {
       console.log(`Koa application is up and running on port ${PORT}`);
