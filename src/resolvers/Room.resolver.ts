@@ -3,6 +3,8 @@ import {
   Authorized,
   Ctx,
   FieldResolver,
+  ID,
+  Int,
   Mutation,
   Query,
   Resolver,
@@ -18,6 +20,12 @@ export class RoomResolver {
   @FieldResolver()
   async users(@Root() room: RoomEntity) {
     return await room.users;
+  }
+
+  @Authorized()
+  @Query(() => RoomEntity)
+  async room(@Arg("id", () => ID) id: number) {
+    return rooms.findRoomById(id);
   }
 
   @Authorized()
@@ -37,15 +45,22 @@ export class RoomResolver {
 
   @Authorized()
   @Mutation(() => RoomEntity)
-  async joinToRoom(@Ctx() context: Context, @Arg("roomId") roomId: number) {
+  async joinToRoom(
+    @Ctx() context: Context,
+    @Arg("roomId", () => Int) roomId: number
+  ) {
     const userId = context.user.userId!;
+    await rooms.leaveRoom({ userId, roomId });
     const room = await rooms.joinToRoom({ userId, roomId });
     return room;
   }
 
   @Authorized()
   @Mutation(() => RoomEntity)
-  async leaveRoom(@Ctx() context: Context, @Arg("roomId") roomId: number) {
+  async leaveRoom(
+    @Ctx() context: Context,
+    @Arg("roomId", () => Int) roomId: number
+  ) {
     const userId = context.user.userId!;
     const room = await rooms.leaveRoom({ userId, roomId });
     return room;
