@@ -5,6 +5,6 @@ export class CaptureQuestionInput {
   @Field()
   userId: number;
 
-  @Field()
+  @Field(() => Int)
   gameId: number;
 }

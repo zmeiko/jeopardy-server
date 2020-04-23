@@ -39,6 +39,17 @@ export async function checkCredentials(payload: {
   return passwordIsValid;
 }
 
+export function verifyTokens(payload: {
+  accessToken?: string;
+  refreshToken?: string;
+}) {
+  const { accessToken, refreshToken } = payload;
+
+  const isAccessTokenValid = !!accessToken && verifyAccessToken(accessToken);
+  const isRefreshTokenValid = verifyRefreshToken(refreshToken);
+  return isAccessTokenValid && isRefreshTokenValid;
+}
+
 export async function processTokens(payload: {
   accessToken?: string;
   refreshToken?: string;

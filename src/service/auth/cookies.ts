@@ -1,4 +1,4 @@
-import * as Cookies from "cookies";
+import Cookies from "cookies";
 import {
   JWT_ACCESS_TOKEN_COOKIE_NAME,
   JWT_ACCESS_TOKEN_LIVE_TIME_MS,

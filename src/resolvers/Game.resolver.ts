@@ -3,6 +3,7 @@ import {
   Authorized,
   Ctx,
   FieldResolver,
+  Int,
   Mutation,
   Query,
   Resolver,
@@ -86,7 +87,7 @@ export class GameResolver {
 
   @Authorized()
   @Query(() => GameEntity)
-  game(@Arg("id") id: number) {
+  game(@Arg("id", () => Int) id: number) {
     return games.findGameById(id);
   }
 

@@ -1,17 +1,12 @@
-import "reflect-metadata";
 import { ApolloServer } from "apollo-server-koa";
+import Koa from "koa";
+import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { CORS_ORIGIN, PORT } from "./config/server";
-import {
-  extractPayloadFromAccessToken,
-  processTokens,
-} from "./controllers/Auth.controller";
 import * as resolvers from "./resolvers";
-import Koa from "koa";
-import { authChecker, tokensIsEquals } from "./service/auth";
-import { extractTokens, updateCookies } from "./service/auth/cookies";
-import { Context } from "./types/Context";
+import { processConnection, processContext } from "./server.context";
+import { authChecker } from "./service/auth";
 
 createConnection()
   .then(async () => {
@@ -23,21 +18,9 @@ createConnection()
     const server = new ApolloServer({
       schema,
       playground: true,
-      context: async (payload: { ctx: Koa.Context }): Promise<Context> => {
-        const { ctx } = payload;
-        const oldTokens = extractTokens(ctx.cookies);
-        const newTokens = await processTokens(oldTokens);
-
-        if (!tokensIsEquals(oldTokens, newTokens)) {
-          updateCookies(newTokens, ctx.cookies);
-        }
-
-        let user;
-        const { accessToken } = newTokens;
-        if (accessToken) {
-          user = extractPayloadFromAccessToken(accessToken);
-        }
-        return { ctx, user };
+      context: processContext,
+      subscriptions: {
+        onConnect: processConnection,
       },
     });
     const app = new Koa();
@@ -50,8 +33,14 @@ createConnection()
       })
     );
 
-    app.listen(PORT, () => {
-      console.log(`Koa application is up and running on port ${PORT}`);
+    const httpServer = app.listen(PORT, () => {
+      console.log(
+        `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
+      );
+      console.log(
+        `🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`
+      );
+      server.installSubscriptionHandlers(httpServer);
     });
   })
   .catch((error) => console.log("TypeORM connection error: ", error));

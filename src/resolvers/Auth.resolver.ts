@@ -34,7 +34,7 @@ export class AuthResolver {
       throw new UserInputError("Incorrect username or password");
     }
     const { accessToken, refreshToken } = await auth.createTokens(data);
-    updateCookies({ accessToken, refreshToken }, context.ctx.cookies);
+    updateCookies({ accessToken, refreshToken }, context.cookies);
     return {
       accessToken,
       refreshToken,
@@ -46,7 +46,7 @@ export class AuthResolver {
     const { username } = data;
     await users.createUser(data);
     const { accessToken, refreshToken } = await auth.createTokens({ username });
-    updateCookies({ accessToken, refreshToken }, context.ctx.cookies);
+    updateCookies({ accessToken, refreshToken }, context.cookies);
     return {
       accessToken,
       refreshToken,
@@ -61,7 +61,7 @@ export class AuthResolver {
     }
     updateCookies(
       { accessToken: undefined, refreshToken: undefined },
-      context.ctx.cookies
+      context.cookies
     );
     return {
       success: true,

@@ -35,15 +35,16 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "xml2json": "^0.12.0",
     "apollo-server-koa": "^2.12.0",
     "bcrypt": "^4.0.1",
     "graphql": "^14.6.0",
+    "graphql-subscriptions": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.0.0",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^0.17.6",
-    "typeorm": "^0.2.24"
+    "typeorm": "^0.2.24",
+    "xml2json": "^0.12.0"
   },
   "lint-staged": {
     "*.ts": [

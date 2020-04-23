@@ -8,6 +8,6 @@ export class AnswerInput {
   @Field()
   answer: string;
 
-  @Field()
+  @Field(() => Int)
   gameId: number;
 }

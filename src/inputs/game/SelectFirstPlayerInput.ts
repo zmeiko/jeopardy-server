@@ -5,6 +5,6 @@ export class SelectFirstPlayerInput {
   @Field()
   userId: number;
 
-  @Field()
+  @Field(() => Int)
   gameId: number;
 }

@@ -1,6 +1,6 @@
-import * as Koa from "koa";
+import Cookies from "cookies";
 export interface Context {
-  ctx: Koa.Context;
+  cookies?: Cookies;
   user?: {
     userId: number;
   };

@@ -5,9 +5,9 @@ export class SelectQuestionInput {
   @Field()
   userId: number;
 
-  @Field()
+  @Field(() => Int)
   questionId: number;
 
-  @Field()
+  @Field(() => Int)
   gameId: number;
 }
