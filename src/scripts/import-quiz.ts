@@ -51,6 +51,9 @@ function processJson(inputJson) {
 }
 
 async function getNewPackages() {
+  if (!fs.existsSync(SIQ_DIR)) {
+    return [];
+  }
   const packageNames = fs
     .readdirSync(SIQ_DIR)
     .filter((name) => path.extname(name) === ".siq");
