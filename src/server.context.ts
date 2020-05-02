@@ -3,6 +3,7 @@ import Cookies from "cookies";
 import Koa from "koa";
 import "reflect-metadata";
 import { ConnectionContext } from "subscriptions-transport-ws";
+import { COOKIES_SECURE } from "./config/server";
 import {
   extractPayloadFromAccessToken,
   processTokens,
@@ -24,6 +25,7 @@ export const processContext: ContextFunction = async (payload: {
 }): Promise<Context> => {
   const { ctx, connection } = payload;
   if (ctx) {
+    ctx.cookies.secure = COOKIES_SECURE;
     const oldTokens = extractTokens(ctx.cookies);
     const newTokens = await processTokens(oldTokens);
 
@@ -47,7 +49,9 @@ export const processConnection = (
   _2: any,
   context: ConnectionContext
 ): AppConnectionContext => {
-  const cookies = new Cookies(context.request, null);
+  const cookies = new Cookies(context.request, null, {
+    secure: COOKIES_SECURE,
+  });
   const tokens = extractTokens(cookies);
   if (verifyTokens(tokens)) {
     const user = extractPayloadFromAccessToken(tokens.accessToken);
