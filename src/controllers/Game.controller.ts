@@ -23,13 +23,13 @@ export async function createGame(payload: {
 }) {
   const { creatorId, roomId, quizId } = payload;
   const room = await rooms.findRoomById(roomId);
-  const quiz = await quizzes.findQuizById(quizId);
+  const quiz = await quizzes.findFullQuizById(quizId);
   const gameUsers = await room.users;
   const creator = await users.findUserById(creatorId);
 
   const stateService = GameService.createInitialState({
     playerIds: gameUsers.map(({ id }) => id),
-    firstRoundId: 1,
+    firstRoundId: quiz.rounds[0].id,
   });
 
   const stateEntry = GameStateEntry.create(
