@@ -18,7 +18,7 @@ export function updateCookies(
   const expiresAccessToken = new Date(now + JWT_ACCESS_TOKEN_LIVE_TIME_MS);
   cookies.set(JWT_ACCESS_TOKEN_COOKIE_NAME, payload.accessToken, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
     secure: COOKIES_SECURE,
     expires: expiresAccessToken,
     overwrite: true,
@@ -27,7 +27,7 @@ export function updateCookies(
   const expiresRefreshToken = new Date(now + JWT_REFRESH_TOKEN_LIVE_TIME_MS);
   cookies.set(JWT_REFRESH_TOKEN_COOKIE_NAME, payload.refreshToken, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
     secure: COOKIES_SECURE,
     expires: expiresRefreshToken,
     overwrite: true,
