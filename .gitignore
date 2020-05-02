@@ -10,3 +10,4 @@ temp/
 schema.graphql
 siq_packages/
 .eslintcache
+.env.local

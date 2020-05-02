@@ -1,13 +1,15 @@
 const IS_DEV = process.env.NODE_ENV !== "production";
+const DATABASE_EXTRA = process.env.DATABASE_EXTRA
+  ? JSON.parse(process.env.DATABASE_EXTRA)
+  : undefined;
+
 const COMMON_OPTIONS = {
-  type: process.env.DATABASE_CONNECTION,
-  host: process.env.DATABASE_HOST,
-  port: process.env.DATABASE_POST,
-  username: process.env.DATABASE_USERNAEM,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_DATABASE,
+  type: "postgres",
+  url: process.env.DATABASE_URL,
   synchronize: false,
   logging: false,
+  ssl: !!process.env.DATABASE_SSL,
+  extra: DATABASE_EXTRA,
   cli: {
     entitiesDir: "src/entity",
     migrationsDir: "src/migration",
