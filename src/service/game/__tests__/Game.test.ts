@@ -30,37 +30,12 @@ function createInitialPayload(payload?: {
   return { settings, state };
 }
 
-test("test select first player", () => {
-  const { settings, state } = createInitialPayload({
-    creatorPlayerId: 1,
-    playerIds: [1, 2],
-    rounds: generateRounds(),
-  });
-
-  const gameState = selectFirstPlayer({ playerId: 1 }, state, settings);
-  expect(gameState.currentPlayerId).toEqual(1);
-});
-
-test("test select first player after selected", () => {
-  const data = createInitialPayload({
-    creatorPlayerId: 1,
-    playerIds: [1, 2],
-    rounds: generateRounds(),
-  });
-  const settings = data.settings;
-  let state = data.state;
-  state = selectFirstPlayer({ playerId: 1 }, state, settings);
-  expect(() =>
-    selectFirstPlayer({ playerId: 2 }, state, settings)
-  ).toThrowError();
-});
-
 test("test finish game after open all cards", () => {
   const USER_ID_1 = 1;
   const USER_ID_2 = 2;
   const data = createInitialPayload({
     creatorPlayerId: USER_ID_1,
-    playerIds: [USER_ID_1, USER_ID_2],
+    playerIds: [USER_ID_2, USER_ID_1],
     rounds: generateRounds({
       roundCount: 1,
       themeCount: 1,
@@ -71,8 +46,6 @@ test("test finish game after open all cards", () => {
   let state = data.state;
 
   const allQuestions = concatAllQuestionInRound(settings.rounds[0]);
-
-  state = selectFirstPlayer({ playerId: USER_ID_1 }, state, settings);
 
   allQuestions.forEach((question) => {
     state = selectQuestion(

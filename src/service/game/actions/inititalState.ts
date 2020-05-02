@@ -39,10 +39,11 @@ export function createInitialState(payload: {
   firstRoundId: number;
 }): GameStatePayload {
   const { playerIds, firstRoundId } = payload;
+  const firstPlayerId = playerIds[playerIds.length / 2];
   return {
-    stateName: ACTIONS_STATES.WAITING_FOR_FIRST_USER,
+    stateName: ACTIONS_STATES.WAITING_FOR_CARD_SELECTION,
     currentRoundId: firstRoundId,
-    currentPlayerId: null,
+    currentPlayerId: firstPlayerId,
     selectedQuestionId: null,
     answeringPlayerId: null,
     cardSelectionAt: null,
