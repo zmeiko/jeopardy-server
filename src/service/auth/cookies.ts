@@ -5,6 +5,7 @@ import {
   JWT_REFRESH_TOKEN_COOKIE_NAME,
   JWT_REFRESH_TOKEN_LIVE_TIME_MS,
 } from "../../config/jwt";
+import { COOKIES_SECURE } from "../../config/server";
 
 export function updateCookies(
   payload: {
@@ -18,6 +19,7 @@ export function updateCookies(
   cookies.set(JWT_ACCESS_TOKEN_COOKIE_NAME, payload.accessToken, {
     httpOnly: true,
     sameSite: "lax",
+    secure: COOKIES_SECURE,
     expires: expiresAccessToken,
     overwrite: true,
   });
@@ -26,6 +28,7 @@ export function updateCookies(
   cookies.set(JWT_REFRESH_TOKEN_COOKIE_NAME, payload.refreshToken, {
     httpOnly: true,
     sameSite: "lax",
+    secure: COOKIES_SECURE,
     expires: expiresRefreshToken,
     overwrite: true,
   });
