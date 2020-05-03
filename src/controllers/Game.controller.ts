@@ -201,3 +201,10 @@ export async function answer(payload: {
     )
   );
 }
+
+export async function tick(payload: { gameId: number }): Promise<GameEntity> {
+  const { gameId } = payload;
+  return await makeGameAction({ gameId }, async ({ state, settings }) =>
+    GameService.tick(state, settings)
+  );
+}

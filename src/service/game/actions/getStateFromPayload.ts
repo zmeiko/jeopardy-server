@@ -3,7 +3,6 @@ import { FinishUserState } from "../states/FinishUserState";
 import { ACTIONS_STATES } from "../states/states.const";
 import { WaitingForAnswer } from "../states/WaitingForAnswer";
 import { WaitingForCardSelection } from "../states/WaitingForCardSelection";
-import { WaitingForFirstPlayerSelectionState } from "../states/WaitingForFirstPlayerSelectionState";
 import { WaitingForQuestionCapture } from "../states/WaitingForQuestionCapture";
 
 export default function getStateFromPayload(
@@ -11,11 +10,6 @@ export default function getStateFromPayload(
   gameSettings: GameSettings
 ): GameState {
   switch (statePayload.stateName) {
-    case ACTIONS_STATES.WAITING_FOR_FIRST_USER:
-      return new WaitingForFirstPlayerSelectionState(
-        statePayload,
-        gameSettings
-      );
     case ACTIONS_STATES.FINISH_GAME:
       return new FinishUserState(statePayload, gameSettings);
     case ACTIONS_STATES.WAITING_FOR_CARD_SELECTION:

@@ -33,25 +33,39 @@ export class WaitingForAnswer extends BaseGameState {
     answer: string;
     timestamp?: Date;
   }): GameState {
-    const { answer: answerText, playerId } = payload;
+    const { answer: answerText, playerId, timestamp = new Date() } = payload;
     const { answeringPlayerId } = this.gameState;
     if (playerId !== answeringPlayerId) {
       throw new Error(`Only user with id = ${playerId} can answer`);
     }
+    if (this.timeIsOver(timestamp)) {
+      return this.wrongAnswer();
+    }
+
     const question = this.getCurrentQuestion();
     const rightAnswer = question.answer;
     if (answerText !== rightAnswer) {
-      return this.wrongAnswer({ price: question.price });
+      return this.wrongAnswer();
     } else {
-      return this.rightAnswer({ price: question.price });
+      return this.rightAnswer();
     }
   }
 
-  protected wrongAnswer(payload: { price: number }): GameState {
+  tick(payload: { timestamp?: Date }): GameState {
+    const { timestamp = new Date() } = payload;
+    if (this.timeIsOver(timestamp)) {
+      return this.wrongAnswer();
+    }
+    return this;
+  }
+
+  protected wrongAnswer(): GameState {
+    const question = this.getCurrentQuestion();
+    const { price } = question;
     const { answeringPlayerId, answeredPlayerIds } = this.gameState;
     const newPlayerScores = updateScore(this.gameState.playerScores, {
       playerId: answeringPlayerId,
-      score: -payload.price,
+      score: -price,
     });
     const newAnsweredPlayerIds = [...answeredPlayerIds, answeringPlayerId];
     const nextPayloadState = {
@@ -68,9 +82,15 @@ export class WaitingForAnswer extends BaseGameState {
       if (roundWillFinish(nextPayloadState, this.gameSettings)) {
         return getNextRoundOrFinishState(nextPayloadState, this.gameSettings);
       } else {
+        const { openedQuestionsIds, selectedQuestionId } = this.gameState;
+        const newOpenedQuestionIds = [
+          ...openedQuestionsIds,
+          selectedQuestionId,
+        ];
         const waitingPayloadState: GameStatePayload = {
           ...nextPayloadState,
           answeringPlayerId: null,
+          openedQuestionsIds: newOpenedQuestionIds,
           answeredPlayerIds: [],
           selectedQuestionId: null,
         };
@@ -85,7 +105,9 @@ export class WaitingForAnswer extends BaseGameState {
     }
   }
 
-  private rightAnswer(payload: { price: number }): GameState {
+  private rightAnswer(): GameState {
+    const question = this.getCurrentQuestion();
+    const { price } = question;
     const {
       answeringPlayerId,
       openedQuestionsIds,
@@ -93,7 +115,7 @@ export class WaitingForAnswer extends BaseGameState {
     } = this.gameState;
     const newPlayerScores = updateScore(this.gameState.playerScores, {
       playerId: answeringPlayerId,
-      score: payload.price,
+      score: price,
     });
     const newOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
     const nextPayloadSate: GameStatePayload = {
@@ -126,5 +148,11 @@ export class WaitingForAnswer extends BaseGameState {
       throw new Error(`Question with id = ${selectedQuestionId} not found`);
     }
     return question;
+  }
+
+  private timeIsOver(timestamp: Date): boolean {
+    const now = timestamp.getTime();
+    const selectedTimestamp = this.gameState.questionCaptureAt?.getTime();
+    return selectedTimestamp + this.gameSettings.answerTimeoutMs < now;
   }
 }

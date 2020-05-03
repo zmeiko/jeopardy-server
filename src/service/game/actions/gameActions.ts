@@ -46,3 +46,11 @@ export function answer(
   const state = getStateFromPayload(gameState, gameSettings);
   return state.answer(payload).gameState;
 }
+
+export function tick(
+  gameState: GameStatePayload,
+  gameSettings: GameSettings
+): GameStatePayload {
+  const state = getStateFromPayload(gameState, gameSettings);
+  return state.tick({}).gameState;
+}

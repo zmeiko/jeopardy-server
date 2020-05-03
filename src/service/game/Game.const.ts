@@ -1,3 +1,4 @@
 export const DEFAULT_SETTINGS = {
   ANSWER_TIMEOUT: 60 * 1000,
+  CAPTURE_TIMEOUT: 20 * 1000,
 };

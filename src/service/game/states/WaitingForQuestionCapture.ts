@@ -26,15 +26,15 @@ export class WaitingForQuestionCapture extends BaseGameState {
       {
         ...this.gameState,
         answeringPlayerId: playerId,
-        questionCaptureAt: new Date(),
+        questionCaptureAt: timestamp,
       },
       this.gameSettings
     );
   }
 
   tick(payload: { timestamp?: Date }): GameState {
-    const { timestamp } = payload;
-    if (!this.timeIsOver(timestamp)) {
+    const { timestamp = new Date() } = payload;
+    if (this.timeIsOver(timestamp)) {
       return this.waitNextCard();
     }
     return this;
@@ -58,10 +58,7 @@ export class WaitingForQuestionCapture extends BaseGameState {
 
   private timeIsOver(timestamp: Date): boolean {
     const now = timestamp.getTime();
-    return (
-      this.gameState.cardSelectionAt?.getTime() +
-        this.gameSettings.captureTimeoutMs >
-      now
-    );
+    const selectedTimestamp = this.gameState.cardSelectionAt?.getTime();
+    return selectedTimestamp + this.gameSettings.captureTimeoutMs < now;
   }
 }

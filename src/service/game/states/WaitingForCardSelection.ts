@@ -19,16 +19,17 @@ export class WaitingForCardSelection extends BaseGameState {
     questionId: number;
     timestamp?: Date;
   }): GameState {
-    const { questionId, playerId } = payload;
+    const { questionId, playerId, timestamp = new Date() } = payload;
     const { currentPlayerId } = this.gameState;
     if (currentPlayerId !== playerId) {
       throw new Error(`Only user with id ${currentPlayerId} can select card`);
     }
+
     return new WaitingForQuestionCapture(
       {
         ...this.gameState,
         selectedQuestionId: questionId,
-        questionCaptureAt: new Date(),
+        cardSelectionAt: timestamp,
       },
       this.gameSettings
     );

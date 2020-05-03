@@ -25,6 +25,7 @@ import {
   SelectQuestionInput,
   CaptureQuestionInput,
 } from "../inputs/game";
+import { DEFAULT_SETTINGS } from "../service/game";
 import { Context } from "../types/Context";
 
 type OnChangeGameState = {
@@ -59,14 +60,20 @@ export class GameResolver {
     @Ctx() ctx: Context,
     @PubSub() pubSub: PubSubEngine
   ) {
+    const { gameId, questionId } = data;
     const game = await games.selectQuestion({
-      gameId: data.gameId,
+      gameId: gameId,
       playerId: ctx.user.userId!,
-      questionId: data.questionId,
+      questionId: questionId,
     });
     await pubSub.publish(CHANGE_GAME_STATE, {
       gameId: data.gameId,
     });
+    //todo change const to GameSettings attribute
+    setTimeout(
+      () => this._tick({ gameId }, pubSub),
+      DEFAULT_SETTINGS.CAPTURE_TIMEOUT
+    );
     return game;
   }
 
@@ -77,13 +84,19 @@ export class GameResolver {
     @Ctx() ctx: Context,
     @PubSub() pubSub: PubSubEngine
   ) {
+    const { gameId } = data;
     const game = await games.captureQuestion({
-      gameId: data.gameId,
+      gameId,
       playerId: ctx.user.userId!,
     });
     await pubSub.publish(CHANGE_GAME_STATE, {
       gameId: data.gameId,
     });
+    //todo change const to GameSettings attribute
+    setTimeout(
+      () => this._tick({ gameId }, pubSub),
+      DEFAULT_SETTINGS.ANSWER_TIMEOUT
+    );
     return game;
   }
 
@@ -126,6 +139,16 @@ export class GameResolver {
     @Arg("gameId", () => Int) gameId: number
   ): Promise<GameStateEntry> {
     return await games.findGameStateByGameId(gameId);
+  }
+
+  async _tick(payload: { gameId: number }, pubSub: PubSubEngine) {
+    const { gameId } = payload;
+    await games.tick({
+      gameId: gameId,
+    });
+    await pubSub.publish(CHANGE_GAME_STATE, {
+      gameId,
+    });
   }
 
   @Authorized()

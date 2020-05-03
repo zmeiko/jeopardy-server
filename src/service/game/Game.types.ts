@@ -21,6 +21,7 @@ export interface GameRound {
 export interface GameSettings {
   rounds: GameRound[];
   captureTimeoutMs: number;
+  answerTimeoutMs: number;
   creatorPlayerId: number;
   playerIds: number[];
 }
