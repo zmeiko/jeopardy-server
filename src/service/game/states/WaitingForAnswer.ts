@@ -5,14 +5,13 @@ import {
   GameState,
   GameStatePayload,
 } from "../Game.types";
-import { createEvent } from "../utils/events.utils";
+import GameStateBuilder from "../utils/StateBuilder";
 import { BaseGameState } from "./BaseGameState";
 import {
   concatAllQuestionInRound,
   findRound,
   getNextRoundOrFinishState,
   roundWillFinish,
-  updateScore,
 } from "./helper";
 
 import { ACTIONS_STATES } from "./states.const";
@@ -64,57 +63,42 @@ export class WaitingForAnswer extends BaseGameState {
   protected wrongAnswer(): GameState {
     const question = this.getCurrentQuestion();
     const { price } = question;
-    const { answeringPlayerId, answeredPlayerIds } = this.gameState;
-    const newPlayerScores = updateScore(this.gameState.playerScores, {
-      playerId: answeringPlayerId,
-      score: -price,
-    });
-    const newAnsweredPlayerIds = [...answeredPlayerIds, answeringPlayerId];
-    const nextPayloadState = {
-      ...this.gameState,
-      playerScore: newPlayerScores,
-      cardSelectionAt: new Date(),
-      answeringUserId: null,
-      answeredPlayerIds: newAnsweredPlayerIds,
-    };
+    const { answeredPlayerIds } = this.gameState;
+    let stateBuilder = new GameStateBuilder(this.gameState)
+      .updateScore({
+        scoreDelta: -price,
+      })
+      .markPlayerAsAnswered()
+      .reselectCard();
+
     const allPlayerHasAnswered =
-      newAnsweredPlayerIds.length === this.gameSettings.playerIds.length;
+      answeredPlayerIds.length + 1 === this.gameSettings.playerIds.length;
 
     if (allPlayerHasAnswered) {
-      if (roundWillFinish(nextPayloadState, this.gameSettings)) {
-        return getNextRoundOrFinishState(nextPayloadState, this.gameSettings);
+      const nextState = stateBuilder.build();
+      if (roundWillFinish(nextState, this.gameSettings)) {
+        return getNextRoundOrFinishState(nextState, this.gameSettings);
       } else {
-        const nextEvents = [
-          ...this.gameState.events,
-          createEvent({
+        stateBuilder = stateBuilder
+          .addEvent({
             type: "on_incorrect_answer",
             properties: {
               rightAnswer: question.answer,
             },
             duration: EVENT_DURATIONS.CORRECT_ANSWER,
-          }),
-        ];
-        const { openedQuestionsIds, selectedQuestionId } = this.gameState;
-        const newOpenedQuestionIds = [
-          ...openedQuestionsIds,
-          selectedQuestionId,
-        ];
-        const waitingPayloadState: GameStatePayload = {
-          ...nextPayloadState,
-          answeringPlayerId: null,
-          openedQuestionsIds: newOpenedQuestionIds,
-          answeredPlayerIds: [],
-          selectedQuestionId: null,
-          events: nextEvents,
-        };
+          })
+          .closeQuestion();
 
         return new WaitingForCardSelection(
-          waitingPayloadState,
+          stateBuilder.build(),
           this.gameSettings
         );
       }
     } else {
-      return new WaitingForQuestionCapture(nextPayloadState, this.gameSettings);
+      return new WaitingForQuestionCapture(
+        stateBuilder.build(),
+        this.gameSettings
+      );
     }
   }
 
@@ -122,40 +106,22 @@ export class WaitingForAnswer extends BaseGameState {
     const { userAnswer } = payload;
     const question = this.getCurrentQuestion();
     const { price } = question;
-    const {
-      answeringPlayerId,
-      openedQuestionsIds,
-      selectedQuestionId,
-    } = this.gameState;
 
-    const nextPlayerScores = updateScore(this.gameState.playerScores, {
-      playerId: answeringPlayerId,
-      score: price,
-    });
-    const nextOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
-
-    const nextEvents = [
-      ...this.gameState.events,
-      createEvent({
+    const nextPayloadSate = new GameStateBuilder(this.gameState)
+      .updateScore({
+        scoreDelta: price,
+      })
+      .closeQuestion()
+      .addEvent({
         type: "on_correct_answer",
         properties: {
           rightAnswer: question.answer,
           userAnswer,
         },
         duration: EVENT_DURATIONS.CORRECT_ANSWER,
-      }),
-    ];
-
-    const nextPayloadSate: GameStatePayload = {
-      ...this.gameState,
-      openedQuestionsIds: nextOpenedQuestionIds,
-      playerScores: nextPlayerScores,
-      currentPlayerId: answeringPlayerId,
-      answeringPlayerId: null,
-      answeredPlayerIds: [],
-      selectedQuestionId: null,
-      events: nextEvents,
-    };
+      })
+      .selectPlayer()
+      .build();
 
     if (roundWillFinish(nextPayloadSate, this.gameSettings)) {
       return getNextRoundOrFinishState(nextPayloadSate, this.gameSettings);

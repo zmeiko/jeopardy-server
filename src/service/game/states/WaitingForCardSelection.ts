@@ -1,4 +1,5 @@
 import { GameSettings, GameState, GameStatePayload } from "../Game.types";
+import GameStateBuilder from "../utils/StateBuilder";
 import { BaseGameState } from "./BaseGameState";
 import { ACTIONS_STATES } from "./states.const";
 import { WaitingForQuestionCapture } from "./WaitingForQuestionCapture";
@@ -25,13 +26,10 @@ export class WaitingForCardSelection extends BaseGameState {
       throw new Error(`Only user with id ${currentPlayerId} can select card`);
     }
 
-    return new WaitingForQuestionCapture(
-      {
-        ...this.gameState,
-        selectedQuestionId: questionId,
-        cardSelectionAt: timestamp,
-      },
-      this.gameSettings
-    );
+    const nextState = new GameStateBuilder(this.gameState)
+      .selectQuestion(questionId)
+      .build();
+
+    return new WaitingForQuestionCapture(nextState, this.gameSettings);
   }
 }
