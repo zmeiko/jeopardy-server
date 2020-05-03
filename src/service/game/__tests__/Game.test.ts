@@ -1,10 +1,9 @@
 import {
-  createInitialState,
-  selectQuestion,
-  selectFirstPlayer,
   answer,
   captureQuestion,
   createGameSettings,
+  createInitialState,
+  selectQuestion,
 } from "../actions";
 import { GameRound } from "../Game.types";
 import { concatAllQuestionInRound } from "../states/helper";
@@ -35,7 +34,7 @@ test("test finish game after open all cards", () => {
   const USER_ID_2 = 2;
   const data = createInitialPayload({
     creatorPlayerId: USER_ID_1,
-    playerIds: [USER_ID_2, USER_ID_1],
+    playerIds: [USER_ID_1, USER_ID_2],
     rounds: generateRounds({
       roundCount: 1,
       themeCount: 1,

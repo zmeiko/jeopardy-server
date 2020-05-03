@@ -19,9 +19,11 @@ export function createGameSettings(payload: {
   creatorPlayerId: number;
   playerIds: number[];
   captureTimeoutMs?: number;
-}) {
+  answerTimeoutMs?: number;
+}): GameSettings {
   const {
-    captureTimeoutMs = DEFAULT_SETTINGS.ANSWER_TIMEOUT,
+    captureTimeoutMs = DEFAULT_SETTINGS.CAPTURE_TIMEOUT,
+    answerTimeoutMs = DEFAULT_SETTINGS.ANSWER_TIMEOUT,
     creatorPlayerId,
     playerIds,
     rounds,
@@ -30,6 +32,7 @@ export function createGameSettings(payload: {
     playerIds,
     rounds,
     captureTimeoutMs,
+    answerTimeoutMs,
     creatorPlayerId,
   };
 }
@@ -39,7 +42,7 @@ export function createInitialState(payload: {
   firstRoundId: number;
 }): GameStatePayload {
   const { playerIds, firstRoundId } = payload;
-  const firstPlayerId = playerIds[playerIds.length / 2];
+  const firstPlayerId = playerIds[0];
   return {
     stateName: ACTIONS_STATES.WAITING_FOR_CARD_SELECTION,
     currentRoundId: firstRoundId,

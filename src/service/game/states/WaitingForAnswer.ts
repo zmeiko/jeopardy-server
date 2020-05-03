@@ -111,6 +111,7 @@ export class WaitingForAnswer extends BaseGameState {
       .updateScore({
         scoreDelta: price,
       })
+      .selectPlayer()
       .closeQuestion()
       .addEvent({
         type: "on_correct_answer",
@@ -120,7 +121,6 @@ export class WaitingForAnswer extends BaseGameState {
         },
         duration: EVENT_DURATIONS.CORRECT_ANSWER,
       })
-      .selectPlayer()
       .build();
 
     if (roundWillFinish(nextPayloadSate, this.gameSettings)) {
