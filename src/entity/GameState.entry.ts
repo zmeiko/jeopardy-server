@@ -6,6 +6,7 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import { GameEntity } from "./Game.entry";
 import { UserEntry } from "./User.entry";
@@ -17,9 +18,13 @@ export class GameStateEntry extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne((type) => GameEntity)
+  @OneToOne((type) => GameEntity, { cascade: true })
   @JoinColumn()
   game: GameEntity;
+
+  @Column()
+  @RelationId((gameStateEntry: GameStateEntry) => gameStateEntry.game)
+  gameId: number;
 
   @Field()
   @Column({

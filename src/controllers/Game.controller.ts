@@ -32,12 +32,7 @@ export async function createGame(payload: {
     firstRoundId: quiz.rounds[0].id,
   });
 
-  const stateEntry = GameStateEntry.create(
-    serviceGameStateToEntryGameState(stateService)
-  );
-
   const game = GameEntity.create({
-    state: stateEntry,
     quiz,
     creator,
   });
@@ -54,6 +49,12 @@ export async function createGame(payload: {
 
   await game.save();
 
+  const stateEntry = GameStateEntry.create({
+    ...serviceGameStateToEntryGameState(stateService),
+    gameId: game.id,
+  });
+
+  await stateEntry.save();
   return game;
 }
 

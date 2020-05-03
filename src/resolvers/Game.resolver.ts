@@ -5,9 +5,13 @@ import {
   FieldResolver,
   Int,
   Mutation,
+  PubSub,
+  PubSubEngine,
   Query,
   Resolver,
+  ResolverFilterData,
   Root,
+  Subscription,
 } from "type-graphql";
 import * as games from "../controllers/Game.controller";
 import * as quizzes from "../controllers/Quiz.controller";
@@ -18,11 +22,16 @@ import { UserEntry } from "../entity/User.entry";
 import {
   CreateNewGameInput,
   AnswerInput,
-  SelectFirstPlayerInput,
   SelectQuestionInput,
   CaptureQuestionInput,
 } from "../inputs/game";
 import { Context } from "../types/Context";
+
+type OnChangeGameState = {
+  gameId: number;
+};
+
+const CHANGE_GAME_STATE = "CHANGE_GAME_STATE";
 
 @Resolver(() => GameEntity)
 export class GameResolver {
@@ -45,42 +54,53 @@ export class GameResolver {
 
   @Authorized()
   @Mutation(() => GameEntity)
-  async selectFirstPlayer(@Arg("data") data: SelectFirstPlayerInput) {
-    const game = await games.selectFirstPlayer({
-      gameId: data.gameId,
-      playerId: data.userId,
-    });
-    return game;
-  }
-
-  @Authorized()
-  @Mutation(() => GameEntity)
-  async selectQuestion(@Arg("data") data: SelectQuestionInput) {
+  async selectQuestion(
+    @Arg("data") data: SelectQuestionInput,
+    @Ctx() ctx: Context,
+    @PubSub() pubSub: PubSubEngine
+  ) {
     const game = await games.selectQuestion({
       gameId: data.gameId,
-      playerId: data.userId,
+      playerId: ctx.user.userId!,
       questionId: data.questionId,
     });
-    return game;
-  }
-
-  @Authorized()
-  @Mutation(() => GameEntity)
-  async captureQuestion(@Arg("data") data: CaptureQuestionInput) {
-    const game = await games.captureQuestion({
+    await pubSub.publish(CHANGE_GAME_STATE, {
       gameId: data.gameId,
-      playerId: data.userId,
     });
     return game;
   }
 
   @Authorized()
   @Mutation(() => GameEntity)
-  async answer(@Arg("data") data: AnswerInput) {
+  async captureQuestion(
+    @Arg("data") data: CaptureQuestionInput,
+    @Ctx() ctx: Context,
+    @PubSub() pubSub: PubSubEngine
+  ) {
+    const game = await games.captureQuestion({
+      gameId: data.gameId,
+      playerId: ctx.user.userId!,
+    });
+    await pubSub.publish(CHANGE_GAME_STATE, {
+      gameId: data.gameId,
+    });
+    return game;
+  }
+
+  @Authorized()
+  @Mutation(() => GameEntity)
+  async answer(
+    @Arg("data") data: AnswerInput,
+    @Ctx() ctx: Context,
+    @PubSub() pubSub: PubSubEngine
+  ) {
     const game = await games.answer({
-      playerId: data.userId,
+      playerId: ctx.user.userId!,
       gameId: data.gameId,
       answer: data.answer,
+    });
+    await pubSub.publish(CHANGE_GAME_STATE, {
+      gameId: data.gameId,
     });
     return game;
   }
@@ -89,6 +109,23 @@ export class GameResolver {
   @Query(() => GameEntity)
   game(@Arg("id", () => Int) id: number) {
     return games.findGameById(id);
+  }
+
+  @Authorized()
+  @Subscription(() => GameStateEntry, {
+    topics: CHANGE_GAME_STATE,
+    filter: (
+      params: ResolverFilterData<OnChangeGameState, { gameId: number }>
+    ) => {
+      const { payload, args } = params;
+      return payload.gameId === args.gameId;
+    },
+  })
+  async onChangeGameState(
+    @Root() payload: OnChangeGameState,
+    @Arg("gameId", () => Int) gameId: number
+  ): Promise<GameStateEntry> {
+    return await games.findGameStateByGameId(gameId);
   }
 
   @Authorized()
