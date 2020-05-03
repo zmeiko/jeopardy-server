@@ -51,5 +51,6 @@ export function createInitialState(payload: {
     openedQuestionsIds: [],
     answeredPlayerIds: [],
     playerScores: createScores(playerIds),
+    events: [],
   };
 }

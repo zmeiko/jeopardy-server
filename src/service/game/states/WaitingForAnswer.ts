@@ -1,9 +1,11 @@
+import { EVENT_DURATIONS } from "../Game.const";
 import {
   GameQuestion,
   GameSettings,
   GameState,
   GameStatePayload,
 } from "../Game.types";
+import { createEvent } from "../utils/events.utils";
 import { BaseGameState } from "./BaseGameState";
 import {
   concatAllQuestionInRound,
@@ -47,7 +49,7 @@ export class WaitingForAnswer extends BaseGameState {
     if (answerText !== rightAnswer) {
       return this.wrongAnswer();
     } else {
-      return this.rightAnswer();
+      return this.rightAnswer({ userAnswer: answerText });
     }
   }
 
@@ -82,6 +84,16 @@ export class WaitingForAnswer extends BaseGameState {
       if (roundWillFinish(nextPayloadState, this.gameSettings)) {
         return getNextRoundOrFinishState(nextPayloadState, this.gameSettings);
       } else {
+        const nextEvents = [
+          ...this.gameState.events,
+          createEvent({
+            type: "on_incorrect_answer",
+            properties: {
+              rightAnswer: question.answer,
+            },
+            duration: EVENT_DURATIONS.CORRECT_ANSWER,
+          }),
+        ];
         const { openedQuestionsIds, selectedQuestionId } = this.gameState;
         const newOpenedQuestionIds = [
           ...openedQuestionsIds,
@@ -93,6 +105,7 @@ export class WaitingForAnswer extends BaseGameState {
           openedQuestionsIds: newOpenedQuestionIds,
           answeredPlayerIds: [],
           selectedQuestionId: null,
+          events: nextEvents,
         };
 
         return new WaitingForCardSelection(
@@ -105,7 +118,8 @@ export class WaitingForAnswer extends BaseGameState {
     }
   }
 
-  private rightAnswer(): GameState {
+  private rightAnswer(payload: { userAnswer: string }): GameState {
+    const { userAnswer } = payload;
     const question = this.getCurrentQuestion();
     const { price } = question;
     const {
@@ -113,20 +127,36 @@ export class WaitingForAnswer extends BaseGameState {
       openedQuestionsIds,
       selectedQuestionId,
     } = this.gameState;
-    const newPlayerScores = updateScore(this.gameState.playerScores, {
+
+    const nextPlayerScores = updateScore(this.gameState.playerScores, {
       playerId: answeringPlayerId,
       score: price,
     });
-    const newOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
+    const nextOpenedQuestionIds = [...openedQuestionsIds, selectedQuestionId];
+
+    const nextEvents = [
+      ...this.gameState.events,
+      createEvent({
+        type: "on_correct_answer",
+        properties: {
+          rightAnswer: question.answer,
+          userAnswer,
+        },
+        duration: EVENT_DURATIONS.CORRECT_ANSWER,
+      }),
+    ];
+
     const nextPayloadSate: GameStatePayload = {
       ...this.gameState,
-      openedQuestionsIds: newOpenedQuestionIds,
-      playerScores: newPlayerScores,
+      openedQuestionsIds: nextOpenedQuestionIds,
+      playerScores: nextPlayerScores,
       currentPlayerId: answeringPlayerId,
       answeringPlayerId: null,
       answeredPlayerIds: [],
       selectedQuestionId: null,
+      events: nextEvents,
     };
+
     if (roundWillFinish(nextPayloadSate, this.gameSettings)) {
       return getNextRoundOrFinishState(nextPayloadSate, this.gameSettings);
     } else {

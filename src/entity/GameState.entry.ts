@@ -9,6 +9,7 @@ import {
   RelationId,
 } from "typeorm";
 import { GameEntity } from "./Game.entry";
+import { GameEventEntity } from "./GameEvent.entry";
 import { UserEntry } from "./User.entry";
 
 @ObjectType("GameState")
@@ -94,4 +95,7 @@ export class GameStateEntry extends BaseEntity {
     type: "simple-array",
   })
   readonly openedQuestionsIds: number[];
+
+  @Field(() => [GameEventEntity])
+  readonly events: GameEventEntity[];
 }

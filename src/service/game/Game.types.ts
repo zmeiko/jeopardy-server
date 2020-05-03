@@ -1,3 +1,5 @@
+import { GameEvent } from "./types";
+
 export interface GameQuestion {
   id: number;
   price: number;
@@ -74,6 +76,7 @@ export interface GameStatePayload {
   readonly openedQuestionsIds: number[];
 
   readonly playerScores: PlayerScore[]; //userId-score
+  readonly events: GameEvent[];
 }
 
 export interface GameState {

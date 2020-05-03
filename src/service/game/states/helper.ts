@@ -5,6 +5,7 @@ import {
   GameStatePayload,
   PlayerScore,
 } from "../Game.types";
+import { GameEvent } from "../types";
 import { FinishUserState } from "./FinishUserState";
 import { WaitingForCardSelection } from "./WaitingForCardSelection";
 

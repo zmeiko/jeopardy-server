@@ -141,7 +141,7 @@ export class GameResolver {
     return await games.findGameStateByGameId(gameId);
   }
 
-  async _tick(payload: { gameId: number }, pubSub: PubSubEngine) {
+  private async _tick(payload: { gameId: number }, pubSub: PubSubEngine) {
     const { gameId } = payload;
     await games.tick({
       gameId: gameId,

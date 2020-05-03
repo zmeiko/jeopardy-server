@@ -3,8 +3,10 @@ import {
   toServiceGameState,
   toGameSettings,
   serviceGameStateToEntryGameState,
+  extractEventEntriesFromServiceGameState,
 } from "../dto/Game.dto";
 import { GameEntity } from "../entity/Game.entry";
+import { GameEventEntity } from "../entity/GameEvent.entry";
 import { GameStateEntry } from "../entity/GameState.entry";
 import { PlayerEntry } from "../entity/Player.entry";
 import GameService, { GameSettings, GameStatePayload } from "../service/game";
@@ -14,6 +16,14 @@ import * as quizzes from "./Quiz.controller";
 
 export async function findAll() {
   return GameEntity.find();
+}
+
+export async function findGameEventsByGameId(gameId: number) {
+  return GameEventEntity.find({
+    where: {
+      gameId,
+    },
+  });
 }
 
 export async function createGame(payload: {
@@ -99,9 +109,16 @@ async function saveNewGameState(payload: {
   const gameEntry = await findGameById(gameId);
 
   let stateEntry = await findGameStateByGameId(gameEntry.id);
-  const newEntryState = serviceGameStateToEntryGameState(state);
-  stateEntry = GameStateEntry.merge(stateEntry, newEntryState);
+  const nextEntryState = serviceGameStateToEntryGameState(state);
+  const newEvents = extractEventEntriesFromServiceGameState(state);
+  stateEntry = GameStateEntry.merge(stateEntry, nextEntryState);
   await stateEntry.save();
+
+  await Promise.all(
+    newEvents.map((event) =>
+      GameEventEntity.create({ ...event, gameId }).save()
+    )
+  );
 
   // Update scores
   await Promise.all(

@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
+import { GameEventEntity } from "./GameEvent.entry";
 import { GameStateEntry } from "./GameState.entry";
 import { PlayerEntry } from "./Player.entry";
 import { QuizEntity } from "./Quiz.entry";
@@ -31,7 +32,7 @@ export class GameEntity extends BaseEntity {
   creatorId: number;
 
   @Field(() => GameStateEntry)
-  @OneToOne((type) => GameStateEntry, { cascade: true })
+  @OneToOne(() => GameStateEntry, { cascade: true })
   state: GameStateEntry;
 
   @Field()
@@ -39,7 +40,7 @@ export class GameEntity extends BaseEntity {
   createdAt: Date;
 
   @Field(() => QuizEntity)
-  @ManyToOne((type) => QuizEntity, { nullable: false })
+  @ManyToOne(() => QuizEntity, { nullable: false })
   quiz: QuizEntity;
 
   @Column()
@@ -47,8 +48,14 @@ export class GameEntity extends BaseEntity {
   quizId: number;
 
   @Field(() => [PlayerEntry])
-  @OneToMany((type) => PlayerEntry, (player) => player.game, {
+  @OneToMany(() => PlayerEntry, (player) => player.game, {
     cascade: true,
   })
   players: Promise<PlayerEntry[]>;
+
+  @Field(() => [GameEventEntity])
+  @OneToMany(() => GameEventEntity, (event) => event.game, {
+    cascade: ["insert"],
+  })
+  events: Promise<GameEventEntity>;
 }

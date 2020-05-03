@@ -1,5 +1,6 @@
 import { DeepPartial } from "typeorm";
 import { GameEntity } from "../entity/Game.entry";
+import { GameEventEntity } from "../entity/GameEvent.entry";
 import { GameStateEntry } from "../entity/GameState.entry";
 import { PlayerEntry } from "../entity/Player.entry";
 import { QuizEntity } from "../entity/Quiz.entry";
@@ -25,6 +26,12 @@ export function serviceGameStateToEntryGameState(
   };
 }
 
+export function extractEventEntriesFromServiceGameState(
+  serviceState: GameStatePayload
+): DeepPartial<GameEventEntity[]> {
+  return serviceState.events;
+}
+
 export function toServiceGameState(payload: {
   entryGameState: GameStateEntry;
   players: PlayerEntry[];
@@ -48,6 +55,7 @@ export function toServiceGameState(payload: {
       score: player.score,
       playerId: player.userId,
     })),
+    events: [],
   };
 }
 
