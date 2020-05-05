@@ -8,10 +8,14 @@ import { UserEntry } from "../entity/User.entry";
 @Resolver(() => GameStateEntry)
 export class GameStateResolver {
   @FieldResolver()
-  async answeringPlayer(@Root() state: GameStateEntry): Promise<UserEntry> {
-    return (await users.findUserById(state.answeringPlayerId, {
-      cache: 1000,
-    }))!;
+  async answeringPlayer(
+    @Root() state: GameStateEntry
+  ): Promise<UserEntry | undefined> {
+    if (state.answeringPlayerId) {
+      return await users.findUserById(state.answeringPlayerId, {
+        cache: 1000,
+      });
+    }
   }
 
   @FieldResolver()

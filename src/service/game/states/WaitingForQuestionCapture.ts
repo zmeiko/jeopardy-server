@@ -4,6 +4,7 @@ import { getNextRoundOrFinishState, roundWillFinish } from "./helper";
 import { ACTIONS_STATES } from "./states.const";
 import { WaitingForAnswer } from "./WaitingForAnswer";
 import { WaitingForCardSelection } from "./WaitingForCardSelection";
+import GameStateBuilder from "../utils/StateBuilder";
 
 export class WaitingForQuestionCapture extends BaseGameState {
   constructor(statePayload: GameStatePayload, gameSettings: GameSettings) {
@@ -41,13 +42,11 @@ export class WaitingForQuestionCapture extends BaseGameState {
   }
 
   private waitNextCard(): GameState {
-    const { openedQuestionsIds, selectedQuestionId } = this.gameState;
-    const newOpenedCardIds = [...openedQuestionsIds, selectedQuestionId];
+    const { selectedQuestionId } = this.gameState;
 
-    const nextGameState = {
-      ...this.gameState,
-      openedQuestionsIds: newOpenedCardIds,
-    };
+    const nextGameState = new GameStateBuilder(this.gameState)
+      .closeQuestion(selectedQuestionId!)
+      .build();
 
     if (roundWillFinish(nextGameState, this.gameSettings)) {
       return getNextRoundOrFinishState(nextGameState, this.gameSettings);
@@ -59,6 +58,9 @@ export class WaitingForQuestionCapture extends BaseGameState {
   private timeIsOver(timestamp: Date): boolean {
     const now = timestamp.getTime();
     const selectedTimestamp = this.gameState.cardSelectionAt?.getTime();
+    if (!selectedTimestamp) {
+      return true;
+    }
     return selectedTimestamp + this.gameSettings.captureTimeoutMs < now;
   }
 }

@@ -14,14 +14,14 @@ import { UserEntry } from "./User.entry";
 export class RoomEntity extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field()
   @Column()
-  name: string;
+  name!: string;
 
   @Field(() => [UserEntry])
   @ManyToMany((type) => UserEntry)
   @JoinTable()
-  users: Promise<UserEntry[]>;
+  users!: Promise<UserEntry[]>;
 }

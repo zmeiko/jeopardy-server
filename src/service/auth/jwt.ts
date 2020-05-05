@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
-import { AuthChecker } from "type-graphql";
 import {
-  JWT_ACCESS_TOKEN_LIVE_TIME_SEC,
   JWT_ACCESS_SECRET,
+  JWT_ACCESS_TOKEN_LIVE_TIME_SEC,
   JWT_REFRESH_SECRET,
   JWT_REFRESH_TOKEN_LIVE_TIME_SEC,
 } from "../../config/jwt";
@@ -34,7 +33,7 @@ export function generateRefreshToken(payload: RefreshTokenPayload): string {
 
 export function verifyAccessToken(token: string): AccessTokenPayload | null {
   try {
-    return jwt.verify(token, JWT_ACCESS_SECRET);
+    return jwt.verify(token, JWT_ACCESS_SECRET) as AccessTokenPayload;
   } catch (e) {
     return null;
   }
@@ -42,13 +41,22 @@ export function verifyAccessToken(token: string): AccessTokenPayload | null {
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
   try {
-    return jwt.verify(token, JWT_REFRESH_SECRET);
+    return jwt.verify(token, JWT_REFRESH_SECRET) as RefreshTokenPayload;
   } catch (e) {
     return null;
   }
 }
 
-export function tokensIsEquals(left: TokenPair, right: TokenPair) {
+export function tokensIsEquals(
+  left: TokenPair | null,
+  right: TokenPair | null
+) {
+  if (left === right) {
+    return true;
+  }
+  if (!left || !right) {
+    return false;
+  }
   return (
     left.accessToken === right.accessToken &&
     left.refreshToken === right.refreshToken

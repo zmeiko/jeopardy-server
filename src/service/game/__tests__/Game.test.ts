@@ -1,48 +1,23 @@
-import {
-  answer,
-  captureQuestion,
-  createGameSettings,
-  createInitialState,
-  selectQuestion,
-} from "../actions";
-import { GameRound } from "../Game.types";
+import { answer, captureQuestion, selectQuestion } from "../actions";
 import { concatAllQuestionInRound } from "../states/helper";
 import { ACTIONS_STATES } from "../states/states.const";
-import { generateRounds } from "./utils";
-
-function createInitialPayload(payload?: {
-  creatorPlayerId?: number;
-  playerIds: number[];
-  rounds: GameRound[];
-}) {
-  const { creatorPlayerId, playerIds, rounds = generateRounds() } =
-    payload || {};
-  const settings = createGameSettings({
-    playerIds,
-    rounds: rounds,
-    creatorPlayerId: creatorPlayerId,
-  });
-  const state = createInitialState({
-    playerIds,
-    firstRoundId: rounds[0].id,
-  });
-  return { settings, state };
-}
+import GameSettingsBuilder from "../utils/SettingsBuilder";
+import GameStateBuilder from "../utils/StateBuilder";
 
 test("test finish game after open all cards", () => {
   const USER_ID_1 = 1;
   const USER_ID_2 = 2;
-  const data = createInitialPayload({
-    creatorPlayerId: USER_ID_1,
-    playerIds: [USER_ID_1, USER_ID_2],
-    rounds: generateRounds({
-      roundCount: 1,
-      themeCount: 1,
-      questionCountInRound: 2,
-    }),
-  });
-  const settings = data.settings;
-  let state = data.state;
+
+  const settings = new GameSettingsBuilder()
+    .addUsers(USER_ID_1, USER_ID_2)
+    .setCreatorId(USER_ID_1)
+    .build();
+
+  let state = new GameStateBuilder()
+    .setStateName(ACTIONS_STATES.WAITING_FOR_CARD_SELECTION)
+    .selectRound(settings.rounds[0].id)
+    .selectPlayer(USER_ID_1)
+    .build();
 
   const allQuestions = concatAllQuestionInRound(settings.rounds[0]);
 

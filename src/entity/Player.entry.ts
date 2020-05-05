@@ -15,7 +15,7 @@ import { UserEntry } from "./User.entry";
 export class PlayerEntry extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
   public userId!: number;
@@ -25,7 +25,7 @@ export class PlayerEntry extends BaseEntity {
 
   @Field()
   @Column()
-  public score: number;
+  public score!: number;
 
   @Field(() => GameEntity)
   @ManyToOne((type) => GameEntity, (game) => game.players)
@@ -35,5 +35,5 @@ export class PlayerEntry extends BaseEntity {
   @Field(() => UserEntry)
   @ManyToOne((type) => UserEntry)
   @JoinColumn()
-  public user!: UserEntry;
+  public user?: UserEntry;
 }

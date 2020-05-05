@@ -10,7 +10,17 @@ export async function createRoom(payload: { name: string }) {
 export async function joinToRoom(payload: { userId: number; roomId: number }) {
   const { roomId, userId } = payload;
   const room = await RoomEntity.findOne(roomId);
+
+  if (!room) {
+    throw new Error(`Room with id = ${roomId} not found`);
+  }
+
   const user = await users.findUserById(userId);
+
+  if (!user) {
+    throw new Error(`User with id = ${userId} not found`);
+  }
+
   const players = await room.users;
   room.users = Promise.resolve([...players, user]);
   await room.save();
@@ -20,7 +30,13 @@ export async function joinToRoom(payload: { userId: number; roomId: number }) {
 export async function leaveRoom(payload: { userId: number; roomId: number }) {
   const { roomId, userId } = payload;
   const room = await RoomEntity.findOne(roomId);
+
+  if (!room) {
+    throw new Error(`Room with id = ${roomId} not found`);
+  }
+
   const players = await room.users;
+
   room.users = Promise.resolve(players.filter((user) => user.id !== userId));
   await room.save();
   return room;

@@ -35,7 +35,12 @@ export class WaitingForAnswer extends BaseGameState {
     timestamp?: Date;
   }): GameState {
     const { answer: answerText, playerId, timestamp = new Date() } = payload;
-    const { answeringPlayerId } = this.gameState;
+    const { answeringPlayerId, selectedQuestionId } = this.gameState;
+
+    if (!answeringPlayerId) {
+      throw new Error("Player not found (Invalid state)");
+    }
+
     if (playerId !== answeringPlayerId) {
       throw new Error(`Only user with id = ${playerId} can answer`);
     }
@@ -63,12 +68,18 @@ export class WaitingForAnswer extends BaseGameState {
   protected wrongAnswer(): GameState {
     const question = this.getCurrentQuestion();
     const { price } = question;
-    const { answeredPlayerIds } = this.gameState;
+    const {
+      answeredPlayerIds,
+      answeringPlayerId,
+      selectedQuestionId,
+    } = this.gameState;
+
     let stateBuilder = new GameStateBuilder(this.gameState)
       .updateScore({
+        playerId: answeringPlayerId!,
         scoreDelta: -price,
       })
-      .markPlayerAsAnswered()
+      .markPlayerAsAnswered(answeringPlayerId!)
       .reselectCard();
 
     const allPlayerHasAnswered =
@@ -87,7 +98,7 @@ export class WaitingForAnswer extends BaseGameState {
             },
             duration: EVENT_DURATIONS.CORRECT_ANSWER,
           })
-          .closeQuestion();
+          .closeQuestion(selectedQuestionId!);
 
         return new WaitingForCardSelection(
           stateBuilder.build(),
@@ -104,15 +115,17 @@ export class WaitingForAnswer extends BaseGameState {
 
   private rightAnswer(payload: { userAnswer: string }): GameState {
     const { userAnswer } = payload;
+    const { answeringPlayerId, selectedQuestionId } = this.gameState;
     const question = this.getCurrentQuestion();
     const { price } = question;
 
     const nextPayloadSate = new GameStateBuilder(this.gameState)
       .updateScore({
+        playerId: answeringPlayerId!,
         scoreDelta: price,
       })
-      .selectPlayer()
-      .closeQuestion()
+      .selectPlayer(answeringPlayerId!)
+      .closeQuestion(selectedQuestionId!)
       .addEvent({
         type: "on_correct_answer",
         properties: {
@@ -149,6 +162,9 @@ export class WaitingForAnswer extends BaseGameState {
   private timeIsOver(timestamp: Date): boolean {
     const now = timestamp.getTime();
     const selectedTimestamp = this.gameState.questionCaptureAt?.getTime();
+    if (!selectedTimestamp) {
+      return true;
+    }
     return selectedTimestamp + this.gameSettings.answerTimeoutMs < now;
   }
 }

@@ -33,13 +33,23 @@ export async function createGame(payload: {
 }) {
   const { creatorId, roomId, quizId } = payload;
   const room = await rooms.findRoomById(roomId);
+
+  if (!room) {
+    throw new Error(`Room with id = ${roomId} not found`);
+  }
+
   const quiz = await quizzes.findFullQuizById(quizId);
-  const gameUsers = await room.users;
+
+  if (!quiz) {
+    throw new Error(`Quiz with id = ${quizId} not found`);
+  }
+
+  const gameUsers = await room.users!;
   const creator = await users.findUserById(creatorId);
 
   const stateService = GameService.createInitialState({
     playerIds: gameUsers.map(({ id }) => id),
-    firstRoundId: quiz.rounds[0].id,
+    firstRoundId: quiz.rounds![0].id,
   });
 
   const game = GameEntity.create({
@@ -85,9 +95,23 @@ export async function findGameStateByGameId(gameId: number) {
 
 async function getStateAndSettingsByGameId(gameId: number) {
   const gameEntry = await findGameById(gameId, { cache: 1000 });
+
+  if (!gameEntry) {
+    throw new Error(`Game with id = ${gameId} not found`);
+  }
+
   const stateEntry = await findGameStateByGameId(gameEntry.id);
+
+  if (!stateEntry) {
+    throw new Error(`State of game for game id = ${gameId} not found`);
+  }
+
   const players = await gameEntry.players;
   const quiz = await quizzes.findFullQuizById(gameEntry.quizId);
+
+  if (!quiz) {
+    throw new Error(`Quiz with id = ${gameEntry.quizId} not found`);
+  }
 
   const gameSettings: GameSettings = toGameSettings({
     game: gameEntry,
@@ -108,7 +132,16 @@ async function saveNewGameState(payload: {
   const { gameId, state } = payload;
   const gameEntry = await findGameById(gameId);
 
+  if (!gameEntry) {
+    throw new Error(`Game with id = ${gameId} not found`);
+  }
+
   let stateEntry = await findGameStateByGameId(gameEntry.id);
+
+  if (!stateEntry) {
+    throw new Error(`State of game for game id = ${gameId} not found`);
+  }
+
   const nextEntryState = serviceGameStateToEntryGameState(state);
   const newEvents = extractEventEntriesFromServiceGameState(state);
   stateEntry = GameStateEntry.merge(stateEntry, nextEntryState);
@@ -138,9 +171,9 @@ async function saveNewGameState(payload: {
   return gameEntry;
 }
 
-type GameAction = ({
-  settings: GameSettings,
-  state: GameStatePayload,
+type GameAction = (payload: {
+  settings: GameSettings;
+  state: GameStatePayload;
 }) => Promise<GameStatePayload>;
 
 async function makeGameAction(payload: { gameId: number }, action: GameAction) {

@@ -19,7 +19,7 @@ import * as rooms from "../controllers/Room.controller";
 import { RoomEntity } from "../entity/Room.entry";
 import { UserEntry } from "../entity/User.entry";
 import { Context } from "../types/Context";
-
+import { UserInputError } from "apollo-server-koa";
 type OnChangeUsersInRoomPayload = {
   roomId: number;
 };
@@ -41,6 +41,9 @@ export class RoomResolver {
     @Arg("roomId", () => Int) roomId: number
   ): Promise<UserEntry[]> {
     const room = await rooms.findRoomById(roomId);
+    if (!room) {
+      throw new UserInputError(`Room with id = ${roomId} not found`);
+    }
     return await room.users;
   }
 
@@ -59,7 +62,7 @@ export class RoomResolver {
   @Authorized()
   @Mutation(() => RoomEntity)
   async createRoom(@Ctx() context: Context, @Arg("name") name: string) {
-    const userId = context.user.userId!;
+    const userId = context!.user!.userId!;
     const room = await rooms.createRoom({ name });
     await rooms.joinToRoom({ userId, roomId: room.id });
     return room;

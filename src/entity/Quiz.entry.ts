@@ -13,13 +13,13 @@ import { RoundEntity } from "./Round.entry";
 export class QuizEntity extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field()
   @Column()
-  name: string;
+  name!: string;
 
   @Field((type) => [RoundEntity])
   @OneToMany((type) => RoundEntity, (round) => round.quiz, { cascade: true })
-  rounds: RoundEntity[];
+  rounds?: RoundEntity[];
 }

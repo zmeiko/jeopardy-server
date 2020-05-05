@@ -14,33 +14,33 @@ import { ThemeEntity } from "./Theme.entry";
 export class QuestionEntity extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field({ nullable: true })
   @Column()
-  type: string;
-
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  title: string | null;
+  type!: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  path: string | null;
+  title?: string | null;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  path?: string | null;
 
   @Field()
   @Column()
-  answer: string;
+  answer!: string;
 
   @Field()
   @Column()
-  price: number;
+  price!: number;
 
   @Field(() => ThemeEntity)
   @ManyToOne(() => ThemeEntity, (theme) => theme.questions)
-  theme: ThemeEntity;
+  theme?: ThemeEntity;
 
   @Column()
   @RelationId((question: QuestionEntity) => question.theme)
-  themeId: number;
+  themeId!: number;
 }

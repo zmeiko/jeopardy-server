@@ -36,12 +36,11 @@ export class RoundResolver {
 
   @FieldResolver()
   async themes(@Root() round: RoundEntity) {
-    const themes2 = await ThemeEntity.find({
+    return await ThemeEntity.find({
       where: {
         roundId: round.id,
       },
     });
-    return themes2;
   }
 }
 

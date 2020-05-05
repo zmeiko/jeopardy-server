@@ -17,23 +17,23 @@ import { RoundEntity } from "./Round.entry";
 export class ThemeEntity extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field()
   @Column()
-  name: string;
+  name!: string;
 
   @Field((type) => [QuestionEntity])
   @OneToMany((type) => QuestionEntity, (question) => question.theme, {
     cascade: true,
   })
-  questions: QuestionEntity[];
+  questions?: QuestionEntity[];
 
   @Field((type) => RoundEntity)
   @ManyToOne((type) => RoundEntity, (round) => round.themes)
-  round: QuizEntity;
+  round?: QuizEntity;
 
   @Column()
   @RelationId((theme: ThemeEntity) => theme.round)
-  roundId: number;
+  roundId!: number;
 }

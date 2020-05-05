@@ -27,7 +27,10 @@ export class WaitingForCardSelection extends BaseGameState {
     }
 
     const nextState = new GameStateBuilder(this.gameState)
-      .selectQuestion(questionId)
+      .selectQuestion({
+        questionId,
+        timestamp,
+      })
       .build();
 
     return new WaitingForQuestionCapture(nextState, this.gameSettings);

@@ -21,41 +21,41 @@ import { UserEntry } from "./User.entry";
 export class GameEntity extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field(() => UserEntry)
   @ManyToOne(() => UserEntry)
-  creator: UserEntry;
+  creator?: UserEntry;
 
   @Column()
   @RelationId((game: GameEntity) => game.creator)
-  creatorId: number;
+  creatorId!: number;
 
   @Field(() => GameStateEntry)
   @OneToOne(() => GameStateEntry, { cascade: true })
-  state: GameStateEntry;
+  state?: GameStateEntry;
 
   @Field()
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Field(() => QuizEntity)
   @ManyToOne(() => QuizEntity, { nullable: false })
-  quiz: QuizEntity;
+  quiz!: QuizEntity;
 
   @Column()
   @RelationId((game: GameEntity) => game.quiz)
-  quizId: number;
+  quizId!: number;
 
   @Field(() => [PlayerEntry])
   @OneToMany(() => PlayerEntry, (player) => player.game, {
     cascade: true,
   })
-  players: Promise<PlayerEntry[]>;
+  players!: Promise<PlayerEntry[]>;
 
   @Field(() => [GameEventEntity])
   @OneToMany(() => GameEventEntity, (event) => event.game, {
     cascade: ["insert"],
   })
-  events: Promise<GameEventEntity>;
+  events!: Promise<GameEventEntity>;
 }

@@ -20,7 +20,7 @@ export class UserResolver {
   @Authorized()
   @Query(() => UserEntry)
   me(@Ctx() ctx: Context) {
-    const userId = ctx.user.userId!;
+    const userId = ctx!.user!.userId!;
     return users.findUserById(userId);
   }
 }

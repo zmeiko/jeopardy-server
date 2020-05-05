@@ -16,6 +16,11 @@ export async function createTokens(payload: {
 }): Promise<TokenPair> {
   const { username } = payload;
   const user = await users.findUserByUsername(username);
+
+  if (!user) {
+    throw new Error(`User with username ${username}`);
+  }
+
   const accessToken = generateAccessToken({
     userId: user.id,
   });
@@ -35,8 +40,7 @@ export async function checkCredentials(payload: {
   username: string;
   password: string;
 }) {
-  const passwordIsValid = await users.checkPassword(payload);
-  return passwordIsValid;
+  return await users.checkPassword(payload);
 }
 
 export function verifyTokens(payload: {
@@ -46,17 +50,19 @@ export function verifyTokens(payload: {
   const { accessToken, refreshToken } = payload;
 
   const isAccessTokenValid = !!accessToken && verifyAccessToken(accessToken);
-  const isRefreshTokenValid = verifyRefreshToken(refreshToken);
+  const isRefreshTokenValid =
+    !!refreshToken && verifyRefreshToken(refreshToken);
   return isAccessTokenValid && isRefreshTokenValid;
 }
 
 export async function processTokens(payload: {
   accessToken?: string;
   refreshToken?: string;
-}): Promise<TokenPair> {
+}): Promise<TokenPair | null> {
   let { accessToken, refreshToken } = payload;
   const isAccessTokenValid = !!accessToken && verifyAccessToken(accessToken);
-  if (!isAccessTokenValid) {
+
+  if (!isAccessTokenValid && refreshToken) {
     const refreshData = verifyRefreshToken(refreshToken);
     if (refreshData) {
       // todo: set refresh token as invalid in database
@@ -68,13 +74,12 @@ export async function processTokens(payload: {
         userId: refreshData.userId,
       });
     } else {
-      accessToken = undefined;
-      refreshToken = undefined;
+      return null;
     }
   }
   return {
-    accessToken,
-    refreshToken,
+    accessToken: accessToken!,
+    refreshToken: refreshToken!,
   };
 }
 

@@ -10,7 +10,7 @@ import { QuestionType, RoundType, ThemeType } from "../service/game";
 
 const SIQ_TMP_DIR = "./temp";
 
-function processQuestion(question): QuestionType {
+function processQuestion(question: any): QuestionType {
   const price = question.price;
   const title = question.scenario.atom;
   const answer = question.right.answer;
@@ -23,7 +23,7 @@ function processQuestion(question): QuestionType {
   };
 }
 
-function processTheme(theme): ThemeType {
+function processTheme(theme: any): ThemeType {
   const name = theme.name;
   const questions = theme.questions.question.map(processQuestion);
   return {
@@ -32,7 +32,7 @@ function processTheme(theme): ThemeType {
   };
 }
 
-function processRound(round): RoundType {
+function processRound(round: any): RoundType {
   const name = round.name;
   const themes = round.themes.theme.map(processTheme);
   return {
@@ -41,7 +41,7 @@ function processRound(round): RoundType {
   };
 }
 
-function processJson(inputJson) {
+function processJson(inputJson: any) {
   const name = inputJson.package.name;
   const rounds = inputJson.package.rounds.round.map(processRound);
   return {
@@ -74,6 +74,8 @@ async function processFile(fileName: string) {
   console.log(`Parse file: ${xmlFile}`);
   const data = fs.readFileSync(xmlFile);
   console.log(`XML to JSON`);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
   const jsonFromXML = JSON.parse(parser.toJson(data));
   console.log(`Process JSON`);
   const json = processJson(jsonFromXML);

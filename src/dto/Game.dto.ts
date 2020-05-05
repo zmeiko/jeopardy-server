@@ -39,17 +39,17 @@ export function toServiceGameState(payload: {
   const { entryGameState, players } = payload;
   return {
     answeredPlayerIds: entryGameState.answeredPlayerIds,
-    answeringPlayerId: entryGameState.answeringPlayerId,
+    answeringPlayerId: entryGameState.answeringPlayerId || null,
     cardSelectionAt: entryGameState.cardSelectionAt
       ? new Date(entryGameState.cardSelectionAt)
       : null,
-    currentPlayerId: entryGameState.currentPlayerId,
+    currentPlayerId: entryGameState.currentPlayerId || null,
     currentRoundId: entryGameState.currentRoundId,
     openedQuestionsIds: entryGameState.openedQuestionsIds,
     questionCaptureAt: entryGameState.questionCaptureAt
       ? new Date(entryGameState.questionCaptureAt)
       : null,
-    selectedQuestionId: entryGameState.selectedQuestionId,
+    selectedQuestionId: entryGameState.selectedQuestionId || null,
     stateName: entryGameState.stateName,
     playerScores: players.map((player) => ({
       score: player.score,
@@ -65,7 +65,10 @@ export function toGameSettings(payload: {
   players: PlayerEntry[];
 }): GameSettings {
   const { game, players, quiz } = payload;
+
   return {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     rounds: quiz.rounds,
     playerIds: players.map(({ userId }) => userId),
     creatorPlayerId: game.creatorId,

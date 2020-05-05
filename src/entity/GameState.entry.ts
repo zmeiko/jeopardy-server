@@ -17,27 +17,27 @@ import { UserEntry } from "./User.entry";
 export class GameStateEntry extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @OneToOne((type) => GameEntity, { cascade: true })
   @JoinColumn()
-  game: GameEntity;
+  game?: GameEntity;
 
   @Column()
   @RelationId((gameStateEntry: GameStateEntry) => gameStateEntry.game)
-  gameId: number;
+  gameId!: number;
 
   @Field()
   @Column({
     nullable: true,
   })
-  stateName: string | null;
+  stateName!: string;
 
   @Field()
   @Column({
     nullable: true,
   })
-  currentRoundId: number;
+  currentRoundId!: number;
 
   @Field({
     nullable: true,
@@ -45,7 +45,7 @@ export class GameStateEntry extends BaseEntity {
   @Column({
     nullable: true,
   })
-  currentPlayerId: number | null;
+  currentPlayerId?: number | null;
 
   @Field({
     nullable: true,
@@ -53,7 +53,7 @@ export class GameStateEntry extends BaseEntity {
   @Column({
     nullable: true,
   })
-  selectedQuestionId: number | null;
+  selectedQuestionId?: number | null;
 
   @Field({
     nullable: true,
@@ -61,7 +61,7 @@ export class GameStateEntry extends BaseEntity {
   @Column({
     nullable: true,
   })
-  answeringPlayerId: number | null;
+  answeringPlayerId?: number | null;
 
   @Field((type) => UserEntry, { nullable: true })
   answeringPlayer?: UserEntry;
@@ -71,7 +71,7 @@ export class GameStateEntry extends BaseEntity {
     type: "simple-array",
     nullable: true,
   })
-  answeredPlayerIds: number[];
+  answeredPlayerIds!: number[];
 
   @Field({
     nullable: true,
@@ -79,7 +79,7 @@ export class GameStateEntry extends BaseEntity {
   @Column({
     nullable: true,
   })
-  readonly cardSelectionAt: Date | null;
+  readonly cardSelectionAt?: Date | null;
 
   @Field({
     nullable: true,
@@ -94,8 +94,8 @@ export class GameStateEntry extends BaseEntity {
     nullable: true,
     type: "simple-array",
   })
-  readonly openedQuestionsIds: number[];
+  readonly openedQuestionsIds!: number[];
 
   @Field(() => [GameEventEntity])
-  readonly events: GameEventEntity[];
+  readonly events?: GameEventEntity[];
 }

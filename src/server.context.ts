@@ -11,11 +11,19 @@ import {
 } from "./controllers/Auth.controller";
 import { tokensIsEquals } from "./service/auth";
 import { extractTokens, updateCookies } from "./service/auth/cookies";
-import { Context } from "./types/Context";
 
 interface AppConnectionContext {
-  user?: { userId: number };
+  user?: { userId: number } | null;
 }
+
+type Context =
+  | {
+      cookies?: Cookies;
+      user?: {
+        userId?: number;
+      } | null;
+    }
+  | undefined;
 
 export const processContext: ContextFunction = async (payload: {
   ctx: Koa.Context;
@@ -26,18 +34,22 @@ export const processContext: ContextFunction = async (payload: {
   const { ctx, connection } = payload;
   if (ctx) {
     ctx.cookies.secure = COOKIES_SECURE;
-    const oldTokens = extractTokens(ctx.cookies);
-    const newTokens = await processTokens(oldTokens);
 
-    if (!tokensIsEquals(oldTokens, newTokens)) {
-      updateCookies(newTokens, ctx.cookies);
+    let user = undefined;
+
+    const requestTokens = extractTokens(ctx.cookies);
+    if (requestTokens.accessToken && requestTokens.accessToken) {
+      const responseTokens = await processTokens(requestTokens);
+
+      if (!tokensIsEquals(requestTokens, responseTokens)) {
+        updateCookies(responseTokens!, ctx.cookies);
+      }
+
+      if (responseTokens?.accessToken) {
+        user = extractPayloadFromAccessToken(responseTokens?.accessToken);
+      }
     }
 
-    let user;
-    const { accessToken } = newTokens;
-    if (accessToken) {
-      user = extractPayloadFromAccessToken(accessToken);
-    }
     return { user, cookies: ctx.cookies };
   } else if (connection) {
     return connection.context;
@@ -49,15 +61,20 @@ export const processConnection = (
   _2: any,
   context: ConnectionContext
 ): AppConnectionContext => {
+  // we need only request cookies
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
   const cookies = new Cookies(context.request, null, {
     secure: COOKIES_SECURE,
   });
   const tokens = extractTokens(cookies);
   if (verifyTokens(tokens)) {
-    const user = extractPayloadFromAccessToken(tokens.accessToken);
+    const user = extractPayloadFromAccessToken(tokens.accessToken!);
     return {
       user,
     };
   }
-  return null;
+  return {
+    user: undefined,
+  };
 };

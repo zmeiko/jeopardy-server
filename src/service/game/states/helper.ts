@@ -5,7 +5,6 @@ import {
   GameStatePayload,
   PlayerScore,
 } from "../Game.types";
-import { GameEvent } from "../types";
 import { FinishUserState } from "./FinishUserState";
 import { WaitingForCardSelection } from "./WaitingForCardSelection";
 
@@ -46,12 +45,12 @@ export function getNextRoundOrFinishState(
     (round) => round.id === currentRoundId
   );
   if (currentRoundIndex === rounds.length - 1) {
-    return new FinishUserState(nextStatePayload, this.gameSettings);
+    return new FinishUserState(nextStatePayload, gameSettings);
   } else {
     const nextRoundId = rounds[currentRoundIndex + 1].id;
     return new WaitingForCardSelection(
       { ...nextStatePayload, currentRoundId: nextRoundId },
-      this.gameSettings
+      gameSettings
     );
   }
 }
@@ -63,7 +62,10 @@ export function updateScore(
   const { score, playerId } = payload;
   const scoreObject = scores.find((item) => (item.playerId = playerId));
   if (!scoreObject) {
-    throw new Error(`User with id = ${playerId} hasn't scores`);
+    scores.push({
+      score: 0,
+      playerId: playerId,
+    });
   }
   return scores.map((scoreObject) => {
     if (scoreObject.playerId === playerId) {

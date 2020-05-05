@@ -18,29 +18,29 @@ import { GameEntity } from "./Game.entry";
 export class GameEventEntity extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @ManyToOne((type) => GameEntity, { nullable: false })
   @JoinColumn()
-  game: GameEntity;
+  game?: GameEntity;
 
   @Column()
   @RelationId((event: GameEventEntity) => event.game)
-  gameId: number;
+  gameId!: number;
 
   @Field()
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Field()
   @Column({ nullable: false })
-  finishedAt: Date;
+  finishedAt!: Date;
 
   @Field()
   @Column()
-  type: EventType;
+  type!: EventType;
 
   @Field(() => JsonType)
   @Column("simple-json")
-  properties: EventPayload;
+  properties!: EventPayload;
 }

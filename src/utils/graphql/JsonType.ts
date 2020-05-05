@@ -1,6 +1,6 @@
-import { GraphQLScalarType, Kind } from "graphql";
+import { GraphQLScalarType } from "graphql";
 
-export const JsonType = new GraphQLScalarType({
+export const JsonType: GraphQLScalarType = new GraphQLScalarType({
   name: "JSON",
   description: "JSON type",
   parseValue(value: string) {
@@ -8,11 +8,5 @@ export const JsonType = new GraphQLScalarType({
   },
   serialize(value: any) {
     return value; // value sent to the client
-  },
-  parseLiteral(ast) {
-    if (ast.kind === Kind.STRING) {
-      return new JsonType(ast.value); // value from the client query
-    }
-    return null;
   },
 });

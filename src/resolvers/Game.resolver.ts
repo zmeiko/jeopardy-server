@@ -45,7 +45,7 @@ export class GameResolver {
   @Authorized()
   @Mutation(() => GameEntity)
   async createGame(@Arg("data") data: CreateNewGameInput, @Ctx() ctx: Context) {
-    const creatorId = ctx.user.userId!;
+    const creatorId = ctx!.user!.userId!;
     const game = await games.createGame({
       ...data,
       creatorId,
@@ -63,7 +63,7 @@ export class GameResolver {
     const { gameId, questionId } = data;
     const game = await games.selectQuestion({
       gameId: gameId,
-      playerId: ctx.user.userId!,
+      playerId: ctx!.user!.userId!,
       questionId: questionId,
     });
     await pubSub.publish(CHANGE_GAME_STATE, {
@@ -87,7 +87,7 @@ export class GameResolver {
     const { gameId } = data;
     const game = await games.captureQuestion({
       gameId,
-      playerId: ctx.user.userId!,
+      playerId: ctx!.user!.userId!,
     });
     await pubSub.publish(CHANGE_GAME_STATE, {
       gameId: data.gameId,
@@ -108,7 +108,7 @@ export class GameResolver {
     @PubSub() pubSub: PubSubEngine
   ) {
     const game = await games.answer({
-      playerId: ctx.user.userId!,
+      playerId: ctx!.user!.userId!,
       gameId: data.gameId,
       answer: data.answer,
     });
@@ -137,7 +137,7 @@ export class GameResolver {
   async onChangeGameState(
     @Root() payload: OnChangeGameState,
     @Arg("gameId", () => Int) gameId: number
-  ): Promise<GameStateEntry> {
+  ) {
     return await games.findGameStateByGameId(gameId);
   }
 

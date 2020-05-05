@@ -52,10 +52,12 @@ class GameSettingsBuilder {
   private themeCount = 1;
   private roundCount = 1;
   private questionsCount = 1;
-  private userIds = [];
-  private creatorId: number;
+  private playerIds: number[] = [];
+  private creatorPlayerId?: number;
 
-  constructor() {
+  constructor(base?: Partial<GameSettings>) {
+    this.playerIds = base?.playerIds ?? [];
+    this.creatorPlayerId = base?.creatorPlayerId;
     return this;
   }
 
@@ -75,27 +77,30 @@ class GameSettingsBuilder {
   }
 
   addUsers(...ids: number[]) {
-    this.userIds.push(...ids);
+    this.playerIds.push(...ids);
     return this;
   }
 
   setCreatorId(id: number) {
-    this.creatorId = id;
+    this.creatorPlayerId = id;
     return this;
   }
 
   build(): GameSettings {
+    if (!this.creatorPlayerId) {
+      throw Error("Creator player id should be defined");
+    }
     const rounds = generateRounds({
       questionCountInRound: this.questionsCount,
       roundCount: this.roundCount,
       themeCount: this.themeCount,
     });
     return {
-      playerIds: this.userIds,
+      playerIds: this.playerIds,
       rounds,
       captureTimeoutMs: DEFAULT_SETTINGS.CAPTURE_TIMEOUT,
       answerTimeoutMs: DEFAULT_SETTINGS.ANSWER_TIMEOUT,
-      creatorPlayerId: this.creatorId,
+      creatorPlayerId: this.creatorPlayerId,
     };
   }
 }

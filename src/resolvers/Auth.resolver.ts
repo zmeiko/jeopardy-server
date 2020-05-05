@@ -3,23 +3,23 @@ import * as auth from "../controllers/Auth.controller";
 import * as users from "../controllers/User.controller";
 import { LoginInput } from "../inputs/auth/LoginInput";
 import { SignUpInput } from "../inputs/auth/SignUpInput";
-import { updateCookies } from "../service/auth/cookies";
+import { removeCookies, updateCookies } from "../service/auth/cookies";
 import { Context } from "../types/Context";
 import { UserInputError } from "apollo-server-koa";
 
 @ObjectType()
 class AuthTokens {
   @Field()
-  accessToken: string;
+  accessToken!: string;
 
   @Field()
-  refreshToken: string;
+  refreshToken!: string;
 }
 
 @ObjectType()
 class LogoutResult {
   @Field()
-  success: boolean;
+  success!: boolean;
 }
 
 @Resolver()
@@ -34,7 +34,11 @@ export class AuthResolver {
       throw new UserInputError("Incorrect username or password");
     }
     const { accessToken, refreshToken } = await auth.createTokens(data);
-    updateCookies({ accessToken, refreshToken }, context.cookies);
+
+    if (context?.cookies) {
+      updateCookies({ accessToken, refreshToken }, context.cookies);
+    }
+
     return {
       accessToken,
       refreshToken,
@@ -46,7 +50,11 @@ export class AuthResolver {
     const { username } = data;
     await users.createUser(data);
     const { accessToken, refreshToken } = await auth.createTokens({ username });
-    updateCookies({ accessToken, refreshToken }, context.cookies);
+
+    if (context?.cookies) {
+      updateCookies({ accessToken, refreshToken }, context.cookies);
+    }
+
     return {
       accessToken,
       refreshToken,
@@ -55,14 +63,13 @@ export class AuthResolver {
 
   @Mutation(() => LogoutResult)
   async logout(@Ctx() context: Context) {
-    const userId = context.user?.userId;
+    const userId = context?.user?.userId;
     if (userId) {
       await auth.logout({ userId });
     }
-    updateCookies(
-      { accessToken: undefined, refreshToken: undefined },
-      context.cookies
-    );
+    if (context?.cookies) {
+      removeCookies(context.cookies);
+    }
     return {
       success: true,
     };

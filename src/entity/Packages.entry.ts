@@ -9,11 +9,11 @@ import {
 @Entity("packages")
 export class PackageEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  packageName: string;
+  packageName!: string;
 
   @CreateDateColumn()
-  importedAt: Date;
+  importedAt!: Date;
 }
