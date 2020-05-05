@@ -5,8 +5,29 @@ import { createEvent } from "./Events.utils";
 
 class GameStateBuilder {
   state: GameStatePayload;
-  constructor(baseState: GameStatePayload) {
-    this.state = baseState;
+  constructor(baseState?: Partial<GameStatePayload>) {
+    this.state = {
+      stateName: null,
+      currentRoundId: null,
+      currentPlayerId: null,
+      selectedQuestionId: null,
+      answeringPlayerId: null,
+      cardSelectionAt: null,
+      questionCaptureAt: null,
+      openedQuestionsIds: [],
+      answeredPlayerIds: [],
+      playerScores: [],
+      events: [],
+      ...baseState,
+    };
+    return this;
+  }
+
+  public setStateName(name: string) {
+    this.state = {
+      ...this.state,
+      stateName: name,
+    };
     return this;
   }
 
