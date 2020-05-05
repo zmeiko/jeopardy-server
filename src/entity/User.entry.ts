@@ -13,7 +13,7 @@ export class UserEntry extends BaseEntity {
     unique: true,
     nullable: false,
   })
-  username?: string;
+  username!: string;
 
   @Column({
     nullable: false,

@@ -27,7 +27,7 @@ export class GameEntity extends BaseEntity {
   @ManyToOne(() => UserEntry)
   creator?: UserEntry;
 
-  @Column()
+  @Column({ nullable: false })
   @RelationId((game: GameEntity) => game.creator)
   creatorId!: number;
 
@@ -43,7 +43,7 @@ export class GameEntity extends BaseEntity {
   @ManyToOne(() => QuizEntity, { nullable: false })
   quiz!: QuizEntity;
 
-  @Column()
+  @Column({ nullable: false })
   @RelationId((game: GameEntity) => game.quiz)
   quizId!: number;
 

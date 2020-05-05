@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import { GameEntity } from "./Game.entry";
 import { UserEntry } from "./User.entry";
@@ -17,23 +18,31 @@ export class PlayerEntry extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
-  public userId!: number;
-
-  @Column()
-  public gameId!: number;
-
-  @Field()
-  @Column()
-  public score!: number;
-
   @Field(() => GameEntity)
   @ManyToOne((type) => GameEntity, (game) => game.players)
   @JoinColumn()
-  public game!: GameEntity;
+  public game?: GameEntity;
+
+  @Column({
+    nullable: false,
+  })
+  @RelationId((player: PlayerEntry) => player.game)
+  public gameId!: number;
+
+  @Field()
+  @Column({
+    nullable: false,
+  })
+  public score!: number;
 
   @Field(() => UserEntry)
   @ManyToOne((type) => UserEntry)
   @JoinColumn()
   public user?: UserEntry;
+
+  @Column({
+    nullable: false,
+  })
+  @RelationId((player: PlayerEntry) => player.user)
+  public userId!: number;
 }
