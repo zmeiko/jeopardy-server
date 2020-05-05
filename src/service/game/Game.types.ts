@@ -11,6 +11,7 @@ export interface GameQuestion {
 }
 
 export interface GameTheme {
+  id: number;
   questions: GameQuestion[];
 }
 

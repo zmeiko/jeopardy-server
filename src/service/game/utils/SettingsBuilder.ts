@@ -1,57 +1,18 @@
-import {
-  GameQuestion,
-  GameRound,
-  GameSettings,
-  GameTheme,
-} from "../Game.types";
+import { GameRound, GameSettings } from "../Game.types";
 import { DEFAULT_SETTINGS } from "../Game.const";
 
-function generateNumberArray(n: number) {
-  return Array.from(new Array(n), (_, i) => i);
-}
-
-function generateQuestion(id: number): GameQuestion {
-  return {
-    id: id,
-    answer: "yes",
-    price: 100,
-    title: `Question #${id}`,
-  };
-}
-
-function generateTheme(payload: {
-  roundIndex: number;
-  questionCount: number;
-}): GameTheme {
-  const { questionCount, roundIndex } = payload;
-  const questions = generateNumberArray(questionCount).map((questionIndex) =>
-    generateQuestion(roundIndex * 10000 + questionIndex)
-  );
-  return {
-    questions,
-  };
-}
-
-function generateRounds(payload?: {
-  roundCount?: number;
-  themeCount?: number;
-  questionCountInRound?: number;
-}): GameRound[] {
-  const { questionCountInRound = 5, roundCount = 1, themeCount = 3 } =
-    payload || {};
-  return generateNumberArray(roundCount).map((roundIndex) => ({
-    id: roundIndex,
-    name: `Round ${roundIndex}`,
-    themes: generateNumberArray(themeCount).map((roundIndex: number) =>
-      generateTheme({ roundIndex, questionCount: questionCountInRound })
-    ),
-  }));
+function findThemeInRound(rounds: GameRound[], themeId: number) {
+  for (const round of rounds) {
+    for (const theme of round.themes) {
+      if (theme.id === themeId) {
+        return theme;
+      }
+    }
+  }
 }
 
 class GameSettingsBuilder {
-  private themeCount = 1;
-  private roundCount = 1;
-  private questionsCount = 1;
+  private rounds: GameRound[] = [];
   private playerIds: number[] = [];
   private creatorPlayerId?: number;
 
@@ -61,18 +22,41 @@ class GameSettingsBuilder {
     return this;
   }
 
-  setThemeCount(count: number) {
-    this.themeCount = count;
+  addRound(payload: { id: number; name?: string }) {
+    const { id, name = "" } = payload;
+    this.rounds.push({ id, name, themes: [] });
     return this;
   }
 
-  setRoundCount(count: number) {
-    this.roundCount = count;
+  addTheme(payload: { id: number; name?: string; roundId: number }) {
+    const { id, roundId, name = "" } = payload;
+    const round = this.rounds.find(({ id }) => id === roundId);
+    if (!round) {
+      throw new Error(`Round with id = ${roundId} not found`);
+    }
+    round.themes.push({ id, questions: [] });
     return this;
   }
 
-  setQuestionCount(count: number) {
-    this.questionsCount = count;
+  addQuestion(payload: {
+    id: number;
+    answer: string;
+    title?: string;
+    type?: string;
+    price?: number;
+    themeId: number;
+  }) {
+    const { id, price = 100, answer, title = "", themeId } = payload;
+    const theme = findThemeInRound(this.rounds, themeId);
+    if (!theme) {
+      throw new Error(`Theme with id = ${themeId} not found`);
+    }
+    theme.questions.push({
+      title,
+      answer,
+      id,
+      price,
+    });
     return this;
   }
 
@@ -90,14 +74,10 @@ class GameSettingsBuilder {
     if (!this.creatorPlayerId) {
       throw Error("Creator player id should be defined");
     }
-    const rounds = generateRounds({
-      questionCountInRound: this.questionsCount,
-      roundCount: this.roundCount,
-      themeCount: this.themeCount,
-    });
+
     return {
       playerIds: this.playerIds,
-      rounds,
+      rounds: this.rounds,
       captureTimeoutMs: DEFAULT_SETTINGS.CAPTURE_TIMEOUT,
       answerTimeoutMs: DEFAULT_SETTINGS.ANSWER_TIMEOUT,
       creatorPlayerId: this.creatorPlayerId,

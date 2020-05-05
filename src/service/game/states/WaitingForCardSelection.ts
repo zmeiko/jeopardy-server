@@ -21,9 +21,13 @@ export class WaitingForCardSelection extends BaseGameState {
     timestamp?: Date;
   }): GameState {
     const { questionId, playerId, timestamp = new Date() } = payload;
-    const { currentPlayerId } = this.gameState;
+    const { currentPlayerId, openedQuestionsIds } = this.gameState;
     if (currentPlayerId !== playerId) {
       throw new Error(`Only user with id ${currentPlayerId} can select card`);
+    }
+
+    if (openedQuestionsIds.includes(questionId)) {
+      throw new Error("Question already have opened");
     }
 
     const nextState = new GameStateBuilder(this.gameState)
