@@ -20,12 +20,12 @@ export class QuestionEntity extends BaseEntity {
   @Column()
   type!: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  @Column("character varying", { nullable: true })
   title?: string | null;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  @Column("character varying", { nullable: true })
   path?: string | null;
 
   @Field()

@@ -39,26 +39,26 @@ export class GameStateEntry extends BaseEntity {
   })
   currentRoundId!: number;
 
-  @Field({
+  @Field(() => Int, {
     nullable: true,
   })
-  @Column({
+  @Column("integer", {
     nullable: true,
   })
   currentPlayerId?: number | null;
 
-  @Field({
+  @Field(() => Int, {
     nullable: true,
   })
-  @Column({
+  @Column("integer", {
     nullable: true,
   })
   selectedQuestionId?: number | null;
 
-  @Field({
+  @Field(() => Int, {
     nullable: true,
   })
-  @Column({
+  @Column("integer", {
     nullable: true,
   })
   answeringPlayerId?: number | null;
@@ -73,18 +73,18 @@ export class GameStateEntry extends BaseEntity {
   })
   answeredPlayerIds!: number[];
 
-  @Field({
+  @Field(() => Date, {
     nullable: true,
   })
-  @Column({
+  @Column("timestamp", {
     nullable: true,
   })
   readonly cardSelectionAt?: Date | null;
 
-  @Field({
+  @Field(() => Date, {
     nullable: true,
   })
-  @Column({
+  @Column("timestamp", {
     nullable: true,
   })
   readonly questionCaptureAt?: Date | null;
