@@ -40,7 +40,7 @@
   "dependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
-    "apollo-server-koa": "^2.12.0",
+    "apollo-server-koa": "^2.14.2",
     "bcrypt": "^4.0.1",
     "graphql": "^14.6.0",
     "graphql-subscriptions": "^1.1.0",
